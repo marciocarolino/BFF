@@ -14,7 +14,7 @@ export class ConfigurationController {
 
   @Get(':id')
   @ApiParam({ name: 'id', description: ' Searching by ID ' })
-  async getById(@Param('id') id: number): Promise<any> {
+  async getById(@Param('id') id: string): Promise<any> {
     return await this.configurationService.getById(id);
   }
 }
