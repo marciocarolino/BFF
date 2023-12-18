@@ -1,0 +1,133 @@
+{
+  "configuration": [
+    {
+      "id": "cd5fa417-b667-482d-b208-798d9da3213z",
+      "avatar": "assets/images/flags/brazil.png",
+      "background": "assets/images/parametrizador-backgroung.png",
+      "name": "ISO 8583 93 - Brazil AMEX Athorization",
+      "version": "Version 1.0",
+      "title": "AMEX-CREDIT",
+      "company": "PagoNxt",
+      "notes": "Do incididunt cillum duis eu pariatur enim proident minim officia amet proident consequat consequat qui consequat magna magna occaecat aliquip culpa pariatur velit nisi nostrud irure eu ullamco exercitation sint.Cillum deserunt laborum laborum quis nisi enim et aliquip labore excepteur in excepteur labore amet in ipsum ipsum nostrud deserunt lorem nisi voluptate dolor minim enim ut eu cupidatat enim.",
+      "anabled": true,
+      "delete": false,
+      "id_country": 2,
+      "id_type_transactions": 1,
+      "id_model_transaction": 2,
+      "environment": {
+        "id": "cd5fa417-b667-482d-b208-798d9da3213f",
+        "name": "Draft"
+      },
+      "type_transactions": {
+        "id": 2,
+        "name": "AMEX-CREDIT"
+      },
+      "model_transaction": {
+        "id": 1,
+        "name": "Authorization"
+      },
+      "country": {
+        "id": 1,
+        "name": "Brazil"
+      }
+    }
+  ],
+  "environment": [
+    {
+      "id": "cd5fa417-b667-482d-b208-798d9da3213c",
+      "name": "Production"
+    },
+    {
+      "id": "cd5fa417-b667-482d-b208-798d9da3213d",
+      "name": "Homolog"
+    },
+    {
+      "id": "cd5fa417-b667-482d-b208-798d9da3213f",
+      "name": "Draft"
+    }
+  ],
+  "type_transactions": [
+    {
+      "id": 1,
+      "name": "AMEX-CREDIT"
+    },
+    {
+      "id": 2,
+      "name": "VISA-CREDIT"
+    },
+    {
+      "id": 3,
+      "name": "MASTERCARD-CREDIT"
+    },
+    {
+      "id": 4,
+      "name": "DEBIT"
+    },
+    {
+      "id": 5,
+      "name": "ATM"
+    },
+    {
+      "id": 6,
+      "name": "ACH"
+    },
+    {
+      "id": 7,
+      "name": "WIRE"
+    },
+    {
+      "id": 8,
+      "name": "MOBILE-PAY"
+    }
+  ],
+  "countries": [
+    {
+      "id": 1,
+      "name": "Brazil"
+    },
+    {
+      "id": 2,
+      "name": "México"
+    },
+    {
+      "id": 3,
+      "name": "França"
+    }
+  ],
+  "model_transaction": [
+    {
+      "id": 1,
+      "name": "Authorization"
+    },
+    {
+      "id": 2,
+      "name": "Authentication"
+    }
+  ],
+  "radioOptions": [
+    {
+      "id": 1,
+      "label": "Enabled",
+      "checked": true,
+      "enabled": true
+    },
+    {
+      "id": 2,
+      "label": "Disabled",
+      "checked": false,
+      "enabled": false
+    }
+  ],
+  "optionsEnabledDisabled": [
+    {
+      "id": 1,
+      "label": "Enabled",
+      "checked": true
+    },
+    {
+      "id": 2,
+      "label": "Dosabled",
+      "checked": false
+    }
+  ]
+}
