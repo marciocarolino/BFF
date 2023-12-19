@@ -1,14 +1,14 @@
 import { TestingModule, Test } from '@nestjs/testing';
 import { ConfigurationController } from '../configuration.controller';
 import { ConfigurationService } from '../configuration.service';
-import { FindByIdDTO } from '../dto/configuration.dto';
 
 describe('ConfigurationController', () => {
   let controller: ConfigurationController;
   let service: ConfigurationService;
+  let module: TestingModule;
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    module = await Test.createTestingModule({
       controllers: [ConfigurationController],
       providers: [ConfigurationService],
     }).compile();

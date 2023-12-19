@@ -14,10 +14,8 @@ export class ConfigurationService {
     );
 
     try {
-      //Lê o conteúdo do arquivo de forma assíncrona
       const fileContent = await fs.readFile(filePath, 'utf-8');
 
-      //faz a solicitação HTTP usando Axios para simular uma requisição
       const response = await axios.get(
         `data:application/json;base64,${Buffer.from(fileContent).toString(
           'base64',
@@ -39,20 +37,16 @@ export class ConfigurationService {
     );
 
     try {
-      //Lê o conteúdo do arquivo de forma assíncrona
       const fileContent = await fs.readFile(filePath, 'utf-8');
 
-      //faz a solicitação HTTP usando Axios para simular uma requisição
       const response = await axios.get(
         `data:application/json;base64,${Buffer.from(fileContent).toString(
           'base64',
         )}`,
       );
 
-      // Faz o parse do conteúdo do arquivo JSON
       const jsonData = JSON.parse(response.data.toString());
 
-      // Encontra o objeto com base no id
       const result = jsonData.configuration.find(
         (config) => config.id === id.id,
       );
