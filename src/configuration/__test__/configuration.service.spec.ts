@@ -69,5 +69,37 @@ describe('ConfigurationService', () => {
 
       expect(result).toBeNull();
     });
+
+    // Adicione casos de teste adicionais, por exemplo, para verificar o comportamento quando getAll lança um erro
+
+    it('should return configuration by id if it exists', async () => {
+      const mockConfigurations = {
+        configuration: [
+          { id: '1', name: 'Config1' },
+          { id: '2', name: 'Config2' },
+        ],
+      };
+
+      jest.spyOn(service, 'getAll').mockResolvedValue(mockConfigurations);
+
+      const result = await service.getById({ id: '2' });
+
+      expect(result).toEqual({ id: '2', name: 'Config2' });
+    });
+
+    it('should return null if configuration with the given id does not exist', async () => {
+      const mockConfigurations = {
+        configuration: [
+          { id: '1', name: 'Config1' },
+          { id: '2', name: 'Config2' },
+        ],
+      };
+
+      jest.spyOn(service, 'getAll').mockResolvedValue(mockConfigurations);
+
+      const result = await service.getById({ id: '3' });
+
+      expect(result).toBeNull();
+    });
   });
 });
