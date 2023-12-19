@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import * as path from 'path';
 import * as fs from 'fs/promises';
-import { Configuration } from 'applicationinsights';
+import { FindByIdDTO } from './dto/configuration.dto';
 
 @Injectable()
 export class ConfigurationService {
@@ -31,7 +31,7 @@ export class ConfigurationService {
     }
   }
 
-  async getById(id: string): Promise<any> {
+  async getById(id: FindByIdDTO): Promise<any> {
     const filePath = path.join(
       __dirname,
       process.env.CONFIGURATION_FILE_PATH,
@@ -49,13 +49,13 @@ export class ConfigurationService {
         )}`,
       );
 
-      // const result = JSON.parse(response.data.toString());
-
       // Faz o parse do conteúdo do arquivo JSON
       const jsonData = JSON.parse(response.data.toString());
 
       // Encontra o objeto com base no id
-      const result = jsonData.configuration.find((config) => config.id === id);
+      const result = jsonData.configuration.find(
+        (config) => config.id === id.id,
+      );
 
       return { configuration: result };
     } catch (error) {

@@ -1,6 +1,7 @@
 import { TestingModule, Test } from '@nestjs/testing';
 import { ConfigurationController } from '../configuration.controller';
 import { ConfigurationService } from '../configuration.service';
+import { FindByIdDTO } from '../dto/configuration.dto';
 
 describe('ConfigurationController', () => {
   let controller: ConfigurationController;
@@ -21,20 +22,25 @@ describe('ConfigurationController', () => {
   });
 
   describe('getAll', () => {
-    it('should return an array of configuration', async () => {
-      const result = ['configuration1', 'configurarion2'];
-      jest.spyOn(service, 'getAll').mockImplementation(async () => result);
-      expect(await controller.getAll()).toBe(result);
+    it('should return all configurations', async () => {
+      const mockResult = { configuration: [] };
+      jest.spyOn(service, 'getAll').mockResolvedValue(mockResult);
+
+      const result = await controller.getAll();
+
+      expect(result).toBe(mockResult);
     });
-  });
 
-  describe('getById', () => {
-    it('should return a configuration by ID', async () => {
-      const id = 1;
-      const result = 'configuration1';
-      jest.spyOn(service, 'getById').mockImplementation(async () => result);
+    describe('getById', () => {
+      it('should return configuration by id', async () => {
+        const mockId = '';
+        const mockResult = { configuration: {} };
+        jest.spyOn(service, 'getById').mockResolvedValue(mockResult);
 
-      expect(await controller.getById(id)).toBe(result);
+        const result = await controller.getById({ id: mockId });
+
+        expect(result).toEqual(mockResult);
+      });
     });
   });
 });
