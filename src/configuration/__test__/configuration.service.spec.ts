@@ -24,9 +24,16 @@ describe('ConfigurationService', () => {
       const mockFileContent = '{"key": "value"}';
       (fs.readFile as jest.Mock).mockResolvedValue(mockFileContent);
 
+      (service as any).configFilePath = 'caminho/do/arquivo.json';
+
       const result = await service.getAll();
 
       expect(result).toEqual({ key: 'value' });
+
+      expect(fs.readFile).toHaveBeenCalledWith(
+        'caminho/do/arquivo.json',
+        'utf-8',
+      );
     });
 
     it('should throw an error when file read fails', async () => {
