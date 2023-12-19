@@ -20,6 +20,17 @@ describe('ConfigurationService', () => {
   });
 
   describe('getAll', () => {
+    it('should throw an error when file read fails in getAll', async () => {
+      // Configurando mock para simular falha na leitura do arquivo
+      (fs.readFile as jest.Mock).mockRejectedValue(
+        new Error('File read error'),
+      );
+
+      // Testando se a chamada a getAll lança o erro esperado
+      await expect(service.getAll()).rejects.toThrowError(
+        'Não foi possível ler as configurações',
+      );
+    });
     it('should return configuration when file is read successfully', async () => {
       const mockFileContent = '{"key": "value"}';
       (fs.readFile as jest.Mock).mockResolvedValue(mockFileContent);
