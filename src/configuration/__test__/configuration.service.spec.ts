@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigurationService } from '../configuration.service';
+import { mockConfigurations } from '../../../test/mock/mockData';
 import * as fs from 'fs/promises';
 
 jest.mock('fs/promises');
@@ -48,13 +49,6 @@ describe('ConfigurationService', () => {
 
   describe('getById', () => {
     it('should return configuration by id if it exists', async () => {
-      const mockConfigurations = {
-        configuration: [
-          { id: '1', name: 'Config1' },
-          { id: '2', name: 'Config2' },
-        ],
-      };
-
       jest.spyOn(service, 'getAll').mockResolvedValue(mockConfigurations);
 
       const result = await service.getById({ id: '2' });
@@ -63,13 +57,6 @@ describe('ConfigurationService', () => {
     });
 
     it('should return null if configuration with the given id does not exist', async () => {
-      const mockConfigurations = {
-        configuration: [
-          { id: '1', name: 'Config1' },
-          { id: '2', name: 'Config2' },
-        ],
-      };
-
       jest.spyOn(service, 'getAll').mockResolvedValue(mockConfigurations);
 
       const result = await service.getById({ id: '3' });
