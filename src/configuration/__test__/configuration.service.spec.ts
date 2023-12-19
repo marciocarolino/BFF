@@ -1,10 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigurationService } from '../configuration.service';
-import axios from 'axios';
 import * as fs from 'fs/promises';
-import * as path from 'path';
 
-jest.mock('axios');
+jest.mock('fs/promises');
 
 describe('ConfigurationService', () => {
   let service: ConfigurationService;
@@ -22,92 +20,54 @@ describe('ConfigurationService', () => {
   });
 
   describe('getAll', () => {
-    it('should return configuration data', async () => {
-      const mockFilePath = 'mocked-file-path';
+    it('should return configuration when file is read successfully', async () => {
       const mockFileContent = '{"key": "value"}';
-      const mockBase64 = Buffer.from(mockFileContent).toString('base64');
-
-      jest.spyOn(fs, 'readFile').mockResolvedValue(mockFileContent);
-
-      jest.spyOn(path, 'join').mockReturnValue(mockFilePath);
-
-      jest.spyOn(axios, 'get').mockResolvedValue({
-        data: Buffer.from(mockBase64, 'base64'),
-      });
+      (fs.readFile as jest.Mock).mockResolvedValue(mockFileContent);
 
       const result = await service.getAll();
 
-      expect(result).toEqual(JSON.parse(mockFileContent));
+      expect(result).toEqual({ key: 'value' });
     });
 
-    it('should throw an error if reading file fails', async () => {
+    it('should throw an error when file read fails', async () => {
       const mockError = new Error('File read error');
+      (fs.readFile as jest.Mock).mockRejectedValue(mockError);
 
-      jest.spyOn(fs, 'readFile').mockRejectedValue(mockError);
-
-      await expect(service.getAll()).rejects.toThrowError(mockError);
-    });
-
-    it('should throw an error if axios.get fails', async () => {
-      const mockFilePath = 'mocked-file-path';
-      const mockFileContent = '{"key": "value"}';
-
-      jest.spyOn(fs, 'readFile').mockResolvedValue(mockFileContent);
-
-      jest.spyOn(path, 'join').mockReturnValue(mockFilePath);
-
-      const mockAxiosError = new Error('Axios error');
-      jest.spyOn(axios, 'get').mockRejectedValue(mockAxiosError);
-
-      await expect(service.getAll()).rejects.toThrowError(mockAxiosError);
+      await expect(service.getAll()).rejects.toThrowError(
+        'Não foi possível ler as configurações',
+      );
     });
   });
 
   describe('getById', () => {
-    it('should return configuration by id', async () => {
-      const mockFilePath = 'mocked-file-path';
-      const mockFileContent =
-        '{"configuration": [{"id": "1", "key": "value"}]}';
-      const mockBase64 = Buffer.from(mockFileContent).toString('base64');
+    it('should return configuration by id if it exists', async () => {
+      const mockConfigurations = {
+        configuration: [
+          { id: '1', name: 'Config1' },
+          { id: '2', name: 'Config2' },
+        ],
+      };
 
-      jest.spyOn(fs, 'readFile').mockResolvedValue(mockFileContent);
+      jest.spyOn(service, 'getAll').mockResolvedValue(mockConfigurations);
 
-      jest.spyOn(path, 'join').mockReturnValue(mockFilePath);
+      const result = await service.getById({ id: '2' });
 
-      jest.spyOn(axios, 'get').mockResolvedValue({
-        data: Buffer.from(mockBase64, 'base64'),
-      });
-
-      const result = await service.getById({ id: '1' });
-
-      expect(result).toEqual({ configuration: { id: '1', key: 'value' } });
+      expect(result).toEqual({ id: '2', name: 'Config2' });
     });
 
-    it('should throw an error if reading file fails', async () => {
-      const mockError = new Error('File read error');
+    it('should return null if configuration with the given id does not exist', async () => {
+      const mockConfigurations = {
+        configuration: [
+          { id: '1', name: 'Config1' },
+          { id: '2', name: 'Config2' },
+        ],
+      };
 
-      jest.spyOn(fs, 'readFile').mockRejectedValue(mockError);
+      jest.spyOn(service, 'getAll').mockResolvedValue(mockConfigurations);
 
-      await expect(service.getById({ id: '1' })).rejects.toThrowError(
-        mockError,
-      );
-    });
+      const result = await service.getById({ id: '3' });
 
-    it('should throw an error if axios.get fails', async () => {
-      const mockFilePath = 'mocked-file-path';
-      const mockFileContent =
-        '{"configuration": [{"id": "1", "key": "value"}]}';
-
-      jest.spyOn(fs, 'readFile').mockResolvedValue(mockFileContent);
-
-      jest.spyOn(path, 'join').mockReturnValue(mockFilePath);
-
-      const mockAxiosError = new Error('Axios error');
-      jest.spyOn(axios, 'get').mockRejectedValue(mockAxiosError);
-
-      await expect(service.getById({ id: '1' })).rejects.toThrowError(
-        mockAxiosError,
-      );
+      expect(result).toBeNull();
     });
   });
 });

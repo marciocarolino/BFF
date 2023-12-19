@@ -1,60 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import axios from 'axios';
-import * as path from 'path';
 import * as fs from 'fs/promises';
 import { FindByIdDTO } from './dto/configuration.dto';
 
 @Injectable()
 export class ConfigurationService {
+  private readonly configFilePath = process.env.CONFIGURATION_FILE_PATH;
+
   async getAll(): Promise<any> {
-    const filePath = path.join(
-      __dirname,
-      process.env.CONFIGURATION_FILE_PATH,
-      'configuration.json',
-    );
-
     try {
-      const fileContent = await fs.readFile(filePath, 'utf-8');
-
-      const response = await axios.get(
-        `data:application/json;base64,${Buffer.from(fileContent).toString(
-          'base64',
-        )}`,
-      );
-
-      return JSON.parse(response.data.toString());
+      const fileContent = await fs.readFile(this.configFilePath, 'utf-8');
+      return JSON.parse(fileContent);
     } catch (error) {
-      console.log(`Error reading JSON file: ${error.message}`);
-      throw error;
+      console.log('Erro ao ler o arquivo JSON', error.message);
+      throw new Error('Não foi possível ler as configurações');
     }
   }
 
   async getById(id: FindByIdDTO): Promise<any> {
-    const filePath = path.join(
-      __dirname,
-      process.env.CONFIGURATION_FILE_PATH,
-      'configuration.json',
+    const configurations = await this.getAll();
+    const configuration = configurations.configuration.find(
+      (config) => config.id === id.id,
     );
 
-    try {
-      const fileContent = await fs.readFile(filePath, 'utf-8');
-
-      const response = await axios.get(
-        `data:application/json;base64,${Buffer.from(fileContent).toString(
-          'base64',
-        )}`,
-      );
-
-      const jsonData = JSON.parse(response.data.toString());
-
-      const result = jsonData.configuration.find(
-        (config) => config.id === id.id,
-      );
-
-      return { configuration: result };
-    } catch (error) {
-      console.log(`Error reading JSON file: ${error.message}`);
-      throw error;
-    }
+    return configuration || null;
   }
 }

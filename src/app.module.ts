@@ -3,7 +3,12 @@ import { ConfigurationModules } from './configuration/configuration.module';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [ConfigModule.forRoot(), ConfigurationModules],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    ConfigurationModules,
+  ],
   controllers: [],
   providers: [],
 })
