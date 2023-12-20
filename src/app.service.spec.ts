@@ -1,5 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AppService } from './app.service';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from './app.module';
+import { SwaggerModule } from '@nestjs/swagger';
 
 describe('AppService', () => {
   let appService: AppService;
@@ -12,17 +15,33 @@ describe('AppService', () => {
     appService = module.get<AppService>(AppService);
   });
 
-  it('should be defined', () => {
-    expect(appService).toBeDefined();
-  });
-
   it('should bootstrap the application', async () => {
-    jest
-      .spyOn(appService, 'bootstrap')
-      .mockImplementationOnce(async () => undefined);
+    const createMock = jest.spyOn(NestFactory, 'create');
+    const appMock: any = {
+      listen: jest.fn(),
+      getHttpAdapter: jest.fn(),
+    };
+    createMock.mockResolvedValue(appMock);
+
+    const createDocumentMock = jest.spyOn(SwaggerModule, 'createDocument');
+    createDocumentMock.mockReturnValue({} as any);
+
+    const setupMock = jest.spyOn(SwaggerModule, 'setup');
+    setupMock.mockImplementation((route, app, document) => {
+      if (app && app.get) {
+        app.get('');
+      }
+    });
 
     await appService.bootstrap();
 
-    expect(appService.bootstrap).toHaveBeenCalled();
+    expect(createMock).toHaveBeenCalledWith(AppModule);
+    expect(createDocumentMock).toHaveBeenCalledWith(
+      appMock,
+      expect.any(Object),
+      expect.any(Object),
+    );
+    expect(setupMock).toHaveBeenCalledWith('api', appMock, expect.any(Object));
+    expect(appMock.listen).toHaveBeenCalledWith(3000);
   });
 });
