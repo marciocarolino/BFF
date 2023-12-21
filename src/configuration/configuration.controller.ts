@@ -3,6 +3,10 @@ import { ConfigurationService } from './configuration.service';
 import { ApiTags } from '@nestjs/swagger';
 import { FindByIdDTO } from './dto/configuration.dto';
 import { OptionalParamsDto } from './dto/optional-params.dto';
+import {
+  UpdateConfigurationDTO,
+  UpdateParamsDTO,
+} from './dto/UpdateConfigurationDTO';
 
 @Controller('configuration')
 @ApiTags('Configuration')
@@ -21,9 +25,9 @@ export class ConfigurationController {
 
   @Put(':id')
   async update(
-    @Param() id: FindByIdDTO,
-    @Body() updateConfiguration: any,
+    @Param() params: UpdateParamsDTO,
+    @Body() updateConfiguration: UpdateConfigurationDTO,
   ): Promise<any> {
-    return await this.configurationService.update(id, updateConfiguration);
+    return await this.configurationService.update(params, updateConfiguration);
   }
 }

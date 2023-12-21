@@ -1,14 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
 import { FindByIdDTO } from './dto/configuration.dto';
 import { OptionalParamsDto } from './dto/optional-params.dto';
-import {
-  configurationMock,
-  setConfigurationMockValue,
-} from './configuration-mock/configuration-mock';
+import { configurationMock } from './configuration-mock/configuration-mock';
 import { buildRequestData } from '../infrastructure/http/configuration/requestDataBuilder';
+import { UpdateParamsDTO } from './dto/UpdateConfigurationDTO';
+
+import { setupMock } from './mockService';
 
 @Injectable()
 export class ConfigurationService {
@@ -20,32 +20,7 @@ export class ConfigurationService {
   }
 
   private setupMock() {
-    //GET
-    this.mock.onGet('/configurations').reply(200, {
-      data: [configurationMock],
-    });
-
-    //UPDATE
-    this.mock.onPut(/\/configurations\/\w+/).reply((config) => {
-      const id = config.url?.split('/').pop();
-      const updateConfiguration = JSON.parse(config.data);
-
-      // Atualizar o mock somente se o ID existir
-      const existingConfiguration = this.getConfigurationById(id);
-
-      if (!existingConfiguration) {
-        throw new NotFoundException(`Configuration with ID ${id} not found`);
-      }
-
-      // Encontrar e atualizar a configuração no array
-      const updatedConfigurations = configurationMock.map((config) =>
-        config.id === id ? { ...config, ...updateConfiguration } : config,
-      );
-      //Atualizando o mock
-      setConfigurationMockValue(updateConfiguration);
-
-      return [200, { data: configurationMock }];
-    });
+    setupMock();
   }
 
   private getConfigurationById(id: string): any | null {
@@ -84,13 +59,16 @@ export class ConfigurationService {
     return configuration || [];
   }
 
-  async update(id: FindByIdDTO, updateConfiguration: any): Promise<any> {
+  async update(
+    params: UpdateParamsDTO,
+    updateConfiguration: any,
+  ): Promise<any> {
     if (!this.isMockSetup) {
       this.setupMock();
       this.isMockSetup = true;
     }
     const response = await axios.put(
-      `/configurations/${id.id}`,
+      `/configurations/${params.country}/${params.tenant}/${params.id}`,
       updateConfiguration,
     );
 

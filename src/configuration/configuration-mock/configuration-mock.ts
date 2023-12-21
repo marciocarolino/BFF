@@ -19,13 +19,29 @@ export const configurationMock = [
     enum_brand: { id: 2, name: 'AMEX-CREDIT' },
     enum_operation_type: { id: 1, name: 'Authorization' },
     enum_country: { id: 1, name: 'Brasil' },
+  },
+];
 
-    /* desconsiderar */
-    title: 'AMEX-CREDIT',
-    company: 'PagoNxt',
-    avatar: 'assets/images/flags/brazil.png',
-    background: 'assets/images/parametrizador-backgroung.png',
-  } /* others */,
+export const brand = [
+  { id: 1, name: 'AMEX-CREDIT' },
+  { id: 2, name: 'VISA-CREDIT' },
+  { id: 3, name: 'MASTERCARD-CREDIT' },
+  { id: 4, name: 'DEBIT' },
+  { id: 5, name: 'ATM' },
+  { id: 6, name: 'ACH' },
+  { id: 7, name: 'WIRE' },
+  { id: 8, name: 'MOBILE-PAY' },
+];
+
+export const countryes = [
+  { id: 1, name: 'Brazil' },
+  { id: 2, name: 'México' },
+  { id: 3, name: 'França' },
+];
+
+export const operation_type = [
+  { id: 1, name: 'Authorization' },
+  { id: 2, name: 'Authentication' },
 ];
 
 export const setConfigurationMockValue = (newValue: any) => {
