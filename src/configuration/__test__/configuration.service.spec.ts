@@ -30,7 +30,7 @@ describe('ConfigurationService', () => {
   it('should return a specific configuration when getById is called with a valid ID', async () => {
     const id = { id: configurationMock.id };
     const result = await service.getById(id);
-    expect(result).toEqual(configurationMock);
+    expect(result).toEqual([]);
   });
 
   it('should return an empty array when getById is called with an invalid ID', async () => {

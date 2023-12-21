@@ -5,7 +5,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { FindByIdDTO } from './dto/configuration.dto';
 import { OptionalParamsDto } from './dto/optional-params.dto';
 import { configurationMock } from './configuration-mock/configuration-mock';
-import { buildRequestData } from 'src/infrastructure/http/requestDataBuilder';
+import { buildRequestData } from '../infrastructure/http/requestDataBuilder';
 
 @Injectable()
 export class ConfigurationService {

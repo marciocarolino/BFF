@@ -36,7 +36,7 @@ describe('ConfigurationController', () => {
 
       expect(result).toBe(mockResult);
     });
-    
+
     describe('getById', () => {
       it('should return configuration by id', async () => {
         const mockId = '';
