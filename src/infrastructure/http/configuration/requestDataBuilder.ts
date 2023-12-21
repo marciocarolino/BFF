@@ -5,7 +5,6 @@ import { OptionalParamsDto } from '../../../configuration/dto/optional-params.dt
 
 export function buildRequestData(params?: OptionalParamsDto): any {
   const mock = configurationMock;
-  const requestData: any = {};
 
   if (params) {
     const { country_iso, operation_type, brand } = params;
@@ -23,18 +22,19 @@ export function buildRequestData(params?: OptionalParamsDto): any {
     };
 
     if (
-      convertedParams.country_iso === undefined ||
-      (mock.country_iso === convertedParams.country_iso &&
-        convertedParams.operation_type === undefined) ||
-      (mock.operation_type === convertedParams.operation_type &&
-        convertedParams.brand === undefined) ||
-      mock.brand === convertedParams.brand
+      !mock.some(
+        (item) =>
+          (convertedParams.country_iso === undefined ||
+            item.country_iso === convertedParams.country_iso) &&
+          (convertedParams.operation_type === undefined ||
+            item.operation_type === convertedParams.operation_type) &&
+          (convertedParams.brand === undefined ||
+            item.brand === convertedParams.brand),
+      )
     ) {
-      return {
-        mock,
-      };
+      return {};
     }
   }
 
-  return requestData;
+  return { mock };
 }

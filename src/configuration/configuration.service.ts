@@ -1,28 +1,62 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 
 import { FindByIdDTO } from './dto/configuration.dto';
 import { OptionalParamsDto } from './dto/optional-params.dto';
-import { configurationMock } from './configuration-mock/configuration-mock';
+import {
+  configurationMock,
+  setConfigurationMockValue,
+} from './configuration-mock/configuration-mock';
 import { buildRequestData } from '../infrastructure/http/configuration/requestDataBuilder';
 
 @Injectable()
 export class ConfigurationService {
   private readonly mock: MockAdapter;
+  private isMockSetup = false;
 
   constructor() {
     this.mock = new MockAdapter(axios);
-    this.setupMock();
   }
 
   private setupMock() {
+    //GET
     this.mock.onGet('/configurations').reply(200, {
       data: [configurationMock],
     });
+
+    //UPDATE
+    this.mock.onPut(/\/configurations\/\w+/).reply((config) => {
+      const id = config.url?.split('/').pop();
+      const updateConfiguration = JSON.parse(config.data);
+
+      // Atualizar o mock somente se o ID existir
+      const existingConfiguration = this.getConfigurationById(id);
+
+      if (!existingConfiguration) {
+        throw new NotFoundException(`Configuration with ID ${id} not found`);
+      }
+
+      // Encontrar e atualizar a configuração no array
+      const updatedConfigurations = configurationMock.map((config) =>
+        config.id === id ? { ...config, ...updateConfiguration } : config,
+      );
+      //Atualizando o mock
+      setConfigurationMockValue(updateConfiguration);
+
+      return [200, { data: configurationMock }];
+    });
+  }
+
+  private getConfigurationById(id: string): any | null {
+    return configurationMock.find((config) => config.id === id) || null;
   }
 
   async getAll(filters?: OptionalParamsDto): Promise<any> {
+    if (!this.isMockSetup) {
+      this.setupMock();
+      this.isMockSetup = true;
+    }
     const requestData = buildRequestData(filters);
     const response = await axios({
       method: 'get',
@@ -34,12 +68,32 @@ export class ConfigurationService {
   }
 
   async getById(id: FindByIdDTO): Promise<any> {
-    const configurations = await this.getAll();
+    if (!this.isMockSetup) {
+      this.setupMock();
+      this.isMockSetup = true;
+    }
+    const response = await this.getAll();
 
-    const configuration = configurations.data?.find(
+    const configurations = Array.isArray(response.data)
+      ? response.data.flat()
+      : [];
+
+    const configuration = configurations.filter(
       (config) => config.id === id.id,
     );
-
     return configuration || [];
+  }
+
+  async update(id: FindByIdDTO, updateConfiguration: any): Promise<any> {
+    if (!this.isMockSetup) {
+      this.setupMock();
+      this.isMockSetup = true;
+    }
+    const response = await axios.put(
+      `/configurations/${id.id}`,
+      updateConfiguration,
+    );
+
+    return response.data;
   }
 }

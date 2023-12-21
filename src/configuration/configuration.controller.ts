@@ -1,4 +1,4 @@
-import { Param, Controller, Get, Query } from '@nestjs/common';
+import { Param, Controller, Get, Query, Put, Body } from '@nestjs/common';
 import { ConfigurationService } from './configuration.service';
 import { ApiTags } from '@nestjs/swagger';
 import { FindByIdDTO } from './dto/configuration.dto';
@@ -17,5 +17,13 @@ export class ConfigurationController {
   @Get(':id')
   async getById(@Param() id: FindByIdDTO): Promise<FindByIdDTO> {
     return await this.configurationService.getById(id);
+  }
+
+  @Put(':id')
+  async update(
+    @Param() id: FindByIdDTO,
+    @Body() updateConfiguration: any,
+  ): Promise<any> {
+    return await this.configurationService.update(id, updateConfiguration);
   }
 }
