@@ -5,6 +5,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { FindByIdDTO } from './dto/configuration.dto';
 import { OptionalParamsDto } from './dto/optional-params.dto';
 import { configurationMock } from './configuration-mock/configuration-mock';
+import { buildRequestData } from 'src/infrastructure/http/requestDataBuilder';
 
 @Injectable()
 export class ConfigurationService {
@@ -21,15 +22,15 @@ export class ConfigurationService {
     });
   }
 
-  async getAll(params?: OptionalParamsDto): Promise<any> {
+  async getAll(filters?: OptionalParamsDto): Promise<any> {
+    const requestData = buildRequestData(filters);
     const response = await axios({
       method: 'get',
       url: '/configurations',
-      data: {
-        configurationMock: params?.configurationMock,
-      },
+      data: requestData,
     });
-    return response.data;
+
+    return response.config.data !== '{}' ? response.data : [];
   }
 
   async getById(id: FindByIdDTO): Promise<any> {
