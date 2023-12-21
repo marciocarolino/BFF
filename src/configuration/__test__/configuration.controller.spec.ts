@@ -1,6 +1,7 @@
 import { TestingModule, Test } from '@nestjs/testing';
 import { ConfigurationController } from '../configuration.controller';
 import { ConfigurationService } from '../configuration.service';
+import { OptionalParamsDto } from '../dto/optional-params.dto';
 
 describe('ConfigurationController', () => {
   let controller: ConfigurationController;
@@ -24,13 +25,18 @@ describe('ConfigurationController', () => {
   describe('getAll', () => {
     it('should return all configurations', async () => {
       const mockResult = { configuration: [] };
+
+      // Ajuste para passar uma instância de OptionalParamsDto conforme esperado pela controladora
+      const mockPass = new OptionalParamsDto();
+      mockPass.configurationMock = 'specificValue'; // Ajuste conforme necessário
+
       jest.spyOn(service, 'getAll').mockResolvedValue(mockResult);
 
-      const result = await controller.getAll();
+      const result = await controller.getAll(mockPass);
 
       expect(result).toBe(mockResult);
     });
-
+    
     describe('getById', () => {
       it('should return configuration by id', async () => {
         const mockId = '';

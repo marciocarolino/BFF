@@ -1,27 +1,44 @@
 import { Injectable } from '@nestjs/common';
-import * as fs from 'fs/promises';
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+
 import { FindByIdDTO } from './dto/configuration.dto';
+import { OptionalParamsDto } from './dto/optional-params.dto';
+import { configurationMock } from './configuration-mock/configuration-mock';
 
 @Injectable()
 export class ConfigurationService {
-  private readonly configFilePath = process.env.CONFIGURATION_FILE_PATH;
+  private readonly mock: MockAdapter;
 
-  async getAll(): Promise<any> {
-    try {
-      const fileContent = await fs.readFile(this.configFilePath, 'utf-8');
-      return JSON.parse(fileContent);
-    } catch (error) {
-      console.log('Erro ao ler o arquivo JSON', error.message);
-      throw new Error('Não foi possível ler as configurações');
-    }
+  constructor() {
+    this.mock = new MockAdapter(axios);
+    this.setupMock();
+  }
+
+  private setupMock() {
+    this.mock.onGet('/configurations').reply(200, {
+      data: [configurationMock],
+    });
+  }
+
+  async getAll(params?: OptionalParamsDto): Promise<any> {
+    const response = await axios({
+      method: 'get',
+      url: '/configurations',
+      data: {
+        configurationMock: params?.configurationMock,
+      },
+    });
+    return response.data;
   }
 
   async getById(id: FindByIdDTO): Promise<any> {
     const configurations = await this.getAll();
-    const configuration = configurations.configuration.find(
+
+    const configuration = configurations.data?.find(
       (config) => config.id === id.id,
     );
 
-    return configuration || null;
+    return configuration || [];
   }
 }

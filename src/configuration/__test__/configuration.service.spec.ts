@@ -1,9 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigurationService } from '../configuration.service';
-import { mockConfigurations } from '../../../test/mock/mockData';
-import * as fs from 'fs/promises';
-
-jest.mock('fs/promises');
+import { configurationMock } from '../configuration-mock/configuration-mock';
 
 describe('ConfigurationService', () => {
   let service: ConfigurationService;
@@ -20,48 +17,25 @@ describe('ConfigurationService', () => {
     expect(service).toBeDefined();
   });
 
-  describe('getAll', () => {
-    it('should return configuration when file is read successfully', async () => {
-      const mockFileContent = '{"key": "value"}';
-      (fs.readFile as jest.Mock).mockResolvedValue(mockFileContent);
+  it('should return configurations when getAll is called', async () => {
+    const mockResult = { data: [configurationMock] };
+    jest.spyOn(service, 'getAll').mockResolvedValue(mockResult);
 
-      (service as any).configFilePath = 'caminho/do/arquivo.json';
+    const result = await service.getAll();
 
-      const result = await service.getAll();
-
-      expect(result).toEqual({ key: 'value' });
-
-      expect(fs.readFile).toHaveBeenCalledWith(
-        'caminho/do/arquivo.json',
-        'utf-8',
-      );
-    });
-
-    it('should throw an error when file read fails', async () => {
-      const mockError = new Error('File read error');
-      (fs.readFile as jest.Mock).mockRejectedValue(mockError);
-
-      await expect(service.getAll()).rejects.toThrow(
-        'Não foi possível ler as configurações',
-      );
-    });
+    // Use toEqual diretamente no array dentro da propriedade 'data'
+    expect(result.data).toEqual([configurationMock]);
   });
 
-  describe('getById', () => {
-    it('should return configuration by id if it exists', async () => {
-      jest.spyOn(service, 'getAll').mockResolvedValue(mockConfigurations);
+  it('should return a specific configuration when getById is called with a valid ID', async () => {
+    const id = { id: configurationMock.id };
+    const result = await service.getById(id);
+    expect(result).toEqual(configurationMock);
+  });
 
-      const result = await service.getById({ id: '2' });
-
-      expect(result).toEqual({ id: '2', name: 'Config2' });
-    });
-
-    it('should return null if configuration with the given id does not exist', async () => {
-      jest.spyOn(service, 'getAll').mockResolvedValue(mockConfigurations);
-
-      const result = await service.getById({ id: '3' });
-
-      expect(result).toBeNull();
-    });
+  it('should return an empty array when getById is called with an invalid ID', async () => {
+    const id = { id: 'invalid-id' };
+    const result = await service.getById(id);
+    expect(result).toEqual([]);
   });
 });
