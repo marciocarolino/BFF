@@ -1,6 +1,6 @@
 import { buildRequestData } from './../requestDataBuilder';
-import { configurationMock } from '../../../configuration/configuration-mock/configuration-mock';
-import { OptionalParamsDto } from '../../../configuration/dto/optional-params.dto';
+import { configurationMock } from '../../../../configuration/configuration-mock/configuration-mock';
+import { OptionalParamsDto } from '../../../../configuration/dto/optional-params.dto';
 
 describe('buildRequestData', () => {
   it('should build request data with params', () => {

@@ -1,7 +1,7 @@
 // requestDataBuilder.ts
 
-import { configurationMock } from '../../configuration/configuration-mock/configuration-mock';
-import { OptionalParamsDto } from '../../configuration/dto/optional-params.dto';
+import { configurationMock } from '../../../configuration/configuration-mock/configuration-mock';
+import { OptionalParamsDto } from '../../../configuration/dto/optional-params.dto';
 
 export function buildRequestData(params?: OptionalParamsDto): any {
   const mock = configurationMock;
