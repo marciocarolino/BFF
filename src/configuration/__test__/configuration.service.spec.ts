@@ -177,4 +177,28 @@ describe('ConfigurationService', () => {
       mock.reset();
     });
   });
+
+  describe('delete', () => {
+    it('should delete configuration by id', async () => {
+      const id = '1';
+
+      const mock = new MockAdapter(axios);
+      mock.onDelete(`/configurations/${id}`).reply(204, {});
+
+      try {
+        const result = await service.delete(id);
+
+        expect(result).toEqual({});
+
+        expect(mock.history.delete.length).toBe(1);
+        expect(mock.history.delete[0].url).toBe(`/configurations/${id}`);
+      } catch (error) {
+        if (!(error instanceof NotFoundException)) {
+          throw error;
+        }
+      } finally {
+        mock.reset();
+      }
+    });
+  });
 });

@@ -68,4 +68,12 @@ export class ConfigurationService {
 
     return response.data;
   }
+
+  async delete(id: string): Promise<any> {
+    this.setupMock();
+
+    const response = await axios.delete(`/configurations/${id}`);
+
+    return response.data;
+  }
 }

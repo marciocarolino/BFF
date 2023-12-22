@@ -6,6 +6,7 @@ import {
 } from './configuration-mock/configuration-mock';
 import { NotFoundException } from '@nestjs/common';
 import { CreateConfigurationDTO } from './dto/createConfiguration.dto';
+import { generateNewConfiguration } from './utils/generateNewConfiguration';
 
 export function setupMock(): MockAdapter {
   const mock = new MockAdapter(axios);
@@ -16,25 +17,7 @@ export function setupMock(): MockAdapter {
 
   mock.onPost('/configurations').reply((config) => {
     const newConfiguration: CreateConfigurationDTO = JSON.parse(config.data);
-
-    // Adicione a lógica para gerar um novo ID
-    const newId = Math.random().toString(36).substring(7);
-    const createdConfiguration = {
-      country_iso: newConfiguration.country_iso,
-      operation_type: newConfiguration.operation_type,
-      brand: newConfiguration.brand,
-      name: newConfiguration.name,
-      description: newConfiguration.description || '',
-      enabled: newConfiguration.enabled || false,
-      version: newConfiguration.version,
-      id: newId,
-      id_enviroment: '',
-      descriptiom: '',
-      environment: { id: '', name: '' },
-      enum_brand: { id: '', name: '' },
-      enum_operation_type: { id: '', name: '' },
-      enum_country: { id: '', name: '' },
-    };
+    const createdConfiguration = generateNewConfiguration(newConfiguration);
 
     configurationMock.push(createdConfiguration);
 
@@ -64,6 +47,26 @@ export function setupMock(): MockAdapter {
     setConfigurationMockValue(existingConfiguration);
 
     return [200, { data: configurationMock }];
+  });
+
+  mock.onDelete(/\/configurations\/\w+/).reply((config) => {
+    const id = config.url?.split('/').pop();
+
+    const existingConfigurationIndex = configurationMock.findIndex(
+      (config) => config.id === id,
+    );
+
+    if (existingConfigurationIndex === -1) {
+      throw new NotFoundException(`Configuration with ID ${id} not found`);
+    }
+
+    // Remove a configuração do array
+    const deletedConfiguration = configurationMock.splice(
+      existingConfigurationIndex,
+      1,
+    );
+
+    return [204, {}]; // 204 significa "No Content", indicando sucesso na exclusão
   });
 
   return mock;

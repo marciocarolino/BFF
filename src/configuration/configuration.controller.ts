@@ -1,4 +1,13 @@
-import { Param, Controller, Get, Query, Put, Body, Post } from '@nestjs/common';
+import {
+  Param,
+  Controller,
+  Get,
+  Query,
+  Put,
+  Body,
+  Post,
+  Delete,
+} from '@nestjs/common';
 import { ConfigurationService } from './configuration.service';
 import { ApiTags } from '@nestjs/swagger';
 import { FindByIdDTO } from './dto/configuration.dto';
@@ -35,5 +44,10 @@ export class ConfigurationController {
     @Body() updateConfiguration: UpdateConfigurationDTO,
   ): Promise<any> {
     return await this.configurationService.update(params, updateConfiguration);
+  }
+
+  @Delete(':id')
+  async delete(@Param('id') id: string): Promise<any> {
+    return await this.configurationService.delete(id);
   }
 }
