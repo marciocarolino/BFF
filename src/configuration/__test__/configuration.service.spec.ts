@@ -153,10 +153,9 @@ describe('ConfigurationService', () => {
         id: 'nonexistent-id',
       };
 
-      const mockUpdatedConfiguration = {
-        ...mockParams,
-        mockUpdateConfiguration,
-      };
+      const mockUpdateConfiguration = {};
+
+      const expectedErrorMessage = `Configuration with ID ${mockParams.id} not found`;
 
       const mock = new MockAdapter(axios);
 
@@ -165,19 +164,14 @@ describe('ConfigurationService', () => {
           `/configurations/${mockParams.country}/${mockParams.tenant}/${mockParams.id}`,
         )
         .reply(404, {
-          message: `Configuration with ID ${mockParams.id} not found`,
+          message: expectedErrorMessage,
         });
 
       try {
-        const result = await service.update(
-          mockParams,
-          mockUpdateConfiguration,
-        );
+        await service.update(mockParams, mockUpdateConfiguration);
       } catch (error) {
         expect(error).toBeInstanceOf(NotFoundException);
-        expect(error.message).toBe(
-          `Configuration with ID ${mockParams.id} not found`,
-        );
+        expect(error.message).toBe(expectedErrorMessage);
       }
 
       mock.reset();
