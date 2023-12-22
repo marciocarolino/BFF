@@ -23,10 +23,6 @@ export class ConfigurationService {
     setupMock();
   }
 
-  private getConfigurationById(id: string): any | null {
-    return configurationMock.find((config) => config.id === id) || null;
-  }
-
   async getAll(filters?: OptionalParamsDto): Promise<any> {
     if (!this.isMockSetup) {
       this.setupMock();

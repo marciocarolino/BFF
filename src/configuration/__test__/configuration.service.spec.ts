@@ -50,11 +50,9 @@ describe('ConfigurationService', () => {
 
   // Teste para a atualização
   it('should update configuration', async () => {
-    // Mockando a implementação do método update
     const mockUpdate = jest
       .spyOn(service, 'update')
       .mockImplementation(async () => {
-        // Simulando o resultado da atualização
         return { data: 'Updated successfully' };
       });
 
@@ -68,26 +66,23 @@ describe('ConfigurationService', () => {
     const updateResult = await service.update(
       {
         id: 'some-id',
-        country: '', // Certifique-se de que os valores certos estão sendo passados aqui
-        tenant: '', // Certifique-se de que os valores certos estão sendo passados aqui
+        country: '',
+        tenant: '',
       },
       updateConfiguration,
     );
 
-    // Verificando se o método foi chamado corretamente
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'some-id',
-        country: '', // Certifique-se de que os valores certos estão sendo passados aqui
-        tenant: '', // Certifique-se de que os valores certos estão sendo passados aqui
+        country: '',
+        tenant: '',
       }),
       updateConfiguration,
     );
 
-    // Verificando o resultado do método
     expect(updateResult).toEqual({ data: 'Updated successfully' });
 
-    // Restaurando a implementação original do método update
     mockUpdate.mockRestore();
   });
 });

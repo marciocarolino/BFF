@@ -6,7 +6,7 @@ import {
 } from './configuration-mock/configuration-mock';
 import { NotFoundException } from '@nestjs/common';
 
-export function setupMock() {
+export function setupMock(): MockAdapter {
   const mock = new MockAdapter(axios);
 
   mock.onGet('/configurations').reply(200, {
@@ -37,4 +37,6 @@ export function setupMock() {
 
     return [200, { data: configurationMock }];
   });
+
+  return mock;
 }
