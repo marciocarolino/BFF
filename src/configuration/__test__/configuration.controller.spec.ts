@@ -30,9 +30,8 @@ describe('ConfigurationController', () => {
     it('should return all configurations', async () => {
       const mockResult = { configuration: [] };
 
-      // Ajuste para passar uma instância de OptionalParamsDto conforme esperado pela controladora
       const mockPass = new OptionalParamsDto();
-      mockPass.configurationMock = 'specificValue'; // Ajuste conforme necessário
+      mockPass.configurationMock = 'specificValue';
 
       jest.spyOn(service, 'getAll').mockResolvedValue(mockResult);
 
@@ -55,7 +54,6 @@ describe('ConfigurationController', () => {
 
     describe('update', () => {
       it('should update configuration by id', async () => {
-        // Criar objetos mock para os parâmetros e o valor de retorno
         const mockParams: UpdateParamsDTO = {
           country: 'Brazil',
           tenant: 'exampleTenant',
@@ -63,7 +61,7 @@ describe('ConfigurationController', () => {
         };
 
         const mockUpdateConfiguration: UpdateConfigurationDTO = {
-          country_iso: 1, // Substitua pelos valores reais que você precisa para o teste
+          country_iso: 1,
           operation_type: 1,
           brand: 1,
           name: 'Novo Nome',
@@ -74,19 +72,15 @@ describe('ConfigurationController', () => {
 
         const mockResult = {};
 
-        // Mock do método update do serviço
         jest.spyOn(service, 'update').mockResolvedValue(mockResult);
 
-        // Chamada do método do controlador
         const result = await controller.update(
           mockParams,
           mockUpdateConfiguration,
         );
 
-        // Verificação se o resultado retornado é igual ao valor esperado
         expect(result).toEqual(mockResult);
 
-        // Verificação se o método update do serviço foi chamado com os parâmetros esperados
         expect(service.update).toHaveBeenCalledWith(
           mockParams,
           mockUpdateConfiguration,

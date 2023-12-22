@@ -6,7 +6,6 @@ import MockAdapter from 'axios-mock-adapter';
 import { ConfigurationService } from './../configuration.service';
 import { configurationMock } from './../configuration-mock/configuration-mock';
 import { buildRequestData } from '../../infrastructure/http/configuration/requestDataBuilder';
-import { NotFoundException } from '@nestjs/common';
 
 describe('ConfigurationService', () => {
   let service: ConfigurationService;
