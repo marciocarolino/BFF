@@ -2,10 +2,9 @@ import { TestingModule, Test } from '@nestjs/testing';
 import { ConfigurationController } from '../configuration.controller';
 import { ConfigurationService } from '../configuration.service';
 import { OptionalParamsDto } from '../dto/optional-params.dto';
-import {
-  UpdateConfigurationDTO,
-  UpdateParamsDTO,
-} from '../dto/UpdateConfigurationDTO';
+import { UpdateParamsDTO } from '../dto/UpdateConfigurationDTO';
+import { NotFoundException } from '@nestjs/common';
+import { mockNewConfiguration, mockUpdateConfiguration } from './mock/mockData';
 
 describe('ConfigurationController', () => {
   let controller: ConfigurationController;
@@ -55,19 +54,9 @@ describe('ConfigurationController', () => {
     describe('update', () => {
       it('should update configuration by id', async () => {
         const mockParams: UpdateParamsDTO = {
-          country: 'Brazil',
+          country: 1,
           tenant: 'exampleTenant',
           id: '1',
-        };
-
-        const mockUpdateConfiguration: UpdateConfigurationDTO = {
-          country_iso: 1,
-          operation_type: 1,
-          brand: 1,
-          name: 'Novo Nome',
-          description: 'Nova Descrição',
-          enabled: true,
-          version: 'Versão 2.0',
         };
 
         const mockResult = {};
@@ -85,6 +74,37 @@ describe('ConfigurationController', () => {
           mockParams,
           mockUpdateConfiguration,
         );
+      });
+    });
+
+    describe('create', () => {
+      it('should create a new configuration', async () => {
+        const mockCreatedConfiguration = {
+          ...mockNewConfiguration,
+          id: 'new-id', // Adicione um ID fictício ou ajuste conforme necessário
+        };
+
+        jest
+          .spyOn(service, 'create')
+          .mockResolvedValue(mockCreatedConfiguration);
+
+        const result = await controller.create(mockNewConfiguration);
+
+        expect(result).toEqual(mockCreatedConfiguration);
+        expect(service.create).toHaveBeenCalledWith(mockNewConfiguration);
+      });
+
+      it('should handle exceptions during creation', async () => {
+        // Simula uma exceção durante a criação
+        jest
+          .spyOn(service, 'create')
+          .mockRejectedValue(new NotFoundException('Some error message'));
+
+        await expect(
+          controller.create(mockNewConfiguration),
+        ).rejects.toThrowError(NotFoundException);
+
+        expect(service.create).toHaveBeenCalledWith(mockNewConfiguration);
       });
     });
   });

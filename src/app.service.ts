@@ -11,6 +11,7 @@ import {
 export class AppService {
   async bootstrap() {
     const app = await NestFactory.create(AppModule);
+    app.enableCors();
 
     const config = new DocumentBuilder()
       .setTitle('BFF')

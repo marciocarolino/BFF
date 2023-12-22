@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
 
 import { FindByIdDTO } from './dto/configuration.dto';
 import { OptionalParamsDto } from './dto/optional-params.dto';
@@ -9,15 +8,11 @@ import { UpdateParamsDTO } from './dto/UpdateConfigurationDTO';
 
 import { setupMock } from './mockService';
 import { configureMockIfNotSetup } from './mockSetup';
+import { CreateConfigurationDTO } from './dto/createConfiguration.dto';
 
 @Injectable()
 export class ConfigurationService {
-  private readonly mock: MockAdapter;
   private isMockSetup = false;
-
-  constructor() {
-    this.mock = new MockAdapter(axios);
-  }
 
   private setupMock() {
     setupMock();
@@ -48,6 +43,17 @@ export class ConfigurationService {
       (config) => config.id === id.id,
     );
     return configuration || [];
+  }
+
+  async create(newConfiguration: CreateConfigurationDTO): Promise<any> {
+    this.setupMock();
+
+    try {
+      const response = await axios.post('/configurations', newConfiguration);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 
   async update(

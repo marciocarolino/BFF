@@ -6,6 +6,9 @@ import MockAdapter from 'axios-mock-adapter';
 import { ConfigurationService } from './../configuration.service';
 import { configurationMock } from './../configuration-mock/configuration-mock';
 import { buildRequestData } from '../../infrastructure/http/configuration/requestDataBuilder';
+import { NotFoundException } from '@nestjs/common';
+import { mockUpdateConfiguration } from './mock/mockData';
+import { UpdateParamsDTO } from '../dto/UpdateConfigurationDTO';
 
 describe('ConfigurationService', () => {
   let service: ConfigurationService;
@@ -66,7 +69,7 @@ describe('ConfigurationService', () => {
     const updateResult = await service.update(
       {
         id: 'some-id',
-        country: '',
+        country: 1,
         tenant: '',
       },
       updateConfiguration,
@@ -75,7 +78,7 @@ describe('ConfigurationService', () => {
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
         id: 'some-id',
-        country: '',
+        country: 1,
         tenant: '',
       }),
       updateConfiguration,
@@ -84,5 +87,100 @@ describe('ConfigurationService', () => {
     expect(updateResult).toEqual({ data: 'Updated successfully' });
 
     mockUpdate.mockRestore();
+  });
+
+  describe('create', () => {
+    it('should create a new configuration', async () => {
+      const mockNewConfiguration = {
+        country_iso: 1,
+        operation_type: 1,
+        brand: 1,
+        name: 'New Configuration',
+        description: 'New Description',
+        enabled: true,
+        version: '1.0',
+      };
+
+      const mockCreatedConfiguration = {
+        ...mockNewConfiguration,
+        id: 'new-id',
+      };
+
+      jest
+        .spyOn(axios, 'post')
+        .mockResolvedValue({ data: mockCreatedConfiguration });
+
+      const result = await service.create(mockNewConfiguration);
+
+      expect(result).toEqual(mockCreatedConfiguration);
+      expect(axios.post).toHaveBeenCalledWith(
+        '/configurations',
+        mockNewConfiguration,
+      );
+    });
+
+    it('should handle exceptions during creation', async () => {
+      const mockNewConfiguration = {
+        country_iso: 1,
+        operation_type: 1,
+        brand: 1,
+        name: 'New Configuration',
+        description: 'New Description',
+        enabled: true,
+        version: '1.0',
+      };
+
+      jest
+        .spyOn(axios, 'post')
+        .mockRejectedValue(new NotFoundException('Some error message'));
+
+      await expect(service.create(mockNewConfiguration)).rejects.toThrowError(
+        NotFoundException,
+      );
+
+      expect(axios.post).toHaveBeenCalledWith(
+        '/configurations',
+        mockNewConfiguration,
+      );
+    });
+  });
+
+  describe('update', () => {
+    it('should update configuration by id', async () => {
+      const mockParams: UpdateParamsDTO = {
+        country: 1,
+        tenant: 'exampleTenant',
+        id: 'nonexistent-id',
+      };
+
+      const mockUpdatedConfiguration = {
+        ...mockParams,
+        mockUpdateConfiguration,
+      };
+
+      const mock = new MockAdapter(axios);
+
+      mock
+        .onPut(
+          `/configurations/${mockParams.country}/${mockParams.tenant}/${mockParams.id}`,
+        )
+        .reply(404, {
+          message: `Configuration with ID ${mockParams.id} not found`,
+        });
+
+      try {
+        const result = await service.update(
+          mockParams,
+          mockUpdateConfiguration,
+        );
+      } catch (error) {
+        expect(error).toBeInstanceOf(NotFoundException);
+        expect(error.message).toBe(
+          `Configuration with ID ${mockParams.id} not found`,
+        );
+      }
+
+      mock.reset();
+    });
   });
 });

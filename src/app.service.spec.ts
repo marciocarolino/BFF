@@ -15,9 +15,10 @@ describe('AppService', () => {
     appService = module.get<AppService>(AppService);
   });
 
-  it('should bootstrap the application', async () => {
+  it('deve inicializar a aplicação', async () => {
     const createMock = jest.spyOn(NestFactory, 'create');
     const appMock: any = {
+      enableCors: jest.fn(), // Simulando o método enableCors
       listen: jest.fn(),
       getHttpAdapter: jest.fn(),
     };
@@ -27,7 +28,7 @@ describe('AppService', () => {
     createDocumentMock.mockReturnValue({} as any);
 
     const setupMock = jest.spyOn(SwaggerModule, 'setup');
-    setupMock.mockImplementation((route, app, document) => {
+    setupMock.mockImplementation((route, app) => {
       if (app && app.get) {
         app.get('');
       }
@@ -36,6 +37,7 @@ describe('AppService', () => {
     await appService.bootstrap();
 
     expect(createMock).toHaveBeenCalledWith(AppModule);
+    expect(appMock.enableCors).toHaveBeenCalled(); // Verifique se o enableCors foi chamado
     expect(createDocumentMock).toHaveBeenCalledWith(
       appMock,
       expect.any(Object),

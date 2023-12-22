@@ -5,12 +5,40 @@ import {
   setConfigurationMockValue,
 } from './configuration-mock/configuration-mock';
 import { NotFoundException } from '@nestjs/common';
+import { CreateConfigurationDTO } from './dto/createConfiguration.dto';
 
 export function setupMock(): MockAdapter {
   const mock = new MockAdapter(axios);
 
   mock.onGet('/configurations').reply(200, {
     data: [configurationMock],
+  });
+
+  mock.onPost('/configurations').reply((config) => {
+    const newConfiguration: CreateConfigurationDTO = JSON.parse(config.data);
+
+    // Adicione a lógica para gerar um novo ID
+    const newId = Math.random().toString(36).substring(7);
+    const createdConfiguration = {
+      country_iso: newConfiguration.country_iso,
+      operation_type: newConfiguration.operation_type,
+      brand: newConfiguration.brand,
+      name: newConfiguration.name,
+      description: newConfiguration.description || '',
+      enabled: newConfiguration.enabled || false,
+      version: newConfiguration.version,
+      id: newId,
+      id_enviroment: '',
+      descriptiom: '',
+      environment: { id: '', name: '' },
+      enum_brand: { id: '', name: '' },
+      enum_operation_type: { id: '', name: '' },
+      enum_country: { id: '', name: '' },
+    };
+
+    configurationMock.push(createdConfiguration);
+
+    return [201, { data: createdConfiguration }];
   });
 
   mock.onPut(/\/configurations\/\w+/).reply((config) => {

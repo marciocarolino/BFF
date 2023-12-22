@@ -1,7 +1,7 @@
 export const configurationMock = [
   {
     id: 'cd5fa417-b667-482d-b208-798d9da3213z',
-    id_enviroment: 'cd5fa417-b667-482d-b208-798d9da3213z',
+    //  id_enviroment: 'cd5fa417-b667-482d-b208-798d9da3213z',
     country_iso: 2,
     brand: 1,
     operation_type: 2,
@@ -14,11 +14,11 @@ export const configurationMock = [
 
     enabled: true,
 
-    environment: { id: 'cd5fa417-b667-482d-b208-798d9da3213f', name: 'Draft' },
+    // environment: { id: 'cd5fa417-b667-482d-b208-798d9da3213f', name: 'Draft' },
 
-    enum_brand: { id: 2, name: 'AMEX-CREDIT' },
-    enum_operation_type: { id: 1, name: 'Authorization' },
-    enum_country: { id: 1, name: 'Brasil' },
+    // enum_brand: { id: 2, name: 'AMEX-CREDIT' },
+    // enum_operation_type: { id: 1, name: 'Authorization' },
+    // enum_country: { id: 1, name: 'Brasil' },
   },
 ];
 
