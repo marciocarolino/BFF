@@ -4,11 +4,11 @@ import MockAdapter from 'axios-mock-adapter';
 
 import { FindByIdDTO } from './dto/configuration.dto';
 import { OptionalParamsDto } from './dto/optional-params.dto';
-import { configurationMock } from './configuration-mock/configuration-mock';
 import { buildRequestData } from '../infrastructure/http/configuration/requestDataBuilder';
 import { UpdateParamsDTO } from './dto/UpdateConfigurationDTO';
 
 import { setupMock } from './mockService';
+import { configureMockIfNotSetup } from './mockSetup';
 
 @Injectable()
 export class ConfigurationService {
@@ -21,13 +21,11 @@ export class ConfigurationService {
 
   private setupMock() {
     setupMock();
+    this.isMockSetup = configureMockIfNotSetup(this.isMockSetup);
   }
 
   async getAll(filters?: OptionalParamsDto): Promise<any> {
-    if (!this.isMockSetup) {
-      this.setupMock();
-      this.isMockSetup = true;
-    }
+    this.setupMock();
     const requestData = buildRequestData(filters);
     const response = await axios({
       method: 'get',
@@ -39,10 +37,7 @@ export class ConfigurationService {
   }
 
   async getById(id: FindByIdDTO): Promise<any> {
-    if (!this.isMockSetup) {
-      this.setupMock();
-      this.isMockSetup = true;
-    }
+    this.setupMock();
     const response = await this.getAll();
 
     const configurations = Array.isArray(response.data)
@@ -59,10 +54,7 @@ export class ConfigurationService {
     params: UpdateParamsDTO,
     updateConfiguration: any,
   ): Promise<any> {
-    if (!this.isMockSetup) {
-      this.setupMock();
-      this.isMockSetup = true;
-    }
+    this.setupMock();
     const response = await axios.put(
       `/configurations/${params.country}/${params.tenant}/${params.id}`,
       updateConfiguration,

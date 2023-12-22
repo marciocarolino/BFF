@@ -2,6 +2,10 @@ import { TestingModule, Test } from '@nestjs/testing';
 import { ConfigurationController } from '../configuration.controller';
 import { ConfigurationService } from '../configuration.service';
 import { OptionalParamsDto } from '../dto/optional-params.dto';
+import {
+  UpdateConfigurationDTO,
+  UpdateParamsDTO,
+} from '../dto/UpdateConfigurationDTO';
 
 describe('ConfigurationController', () => {
   let controller: ConfigurationController;
@@ -46,6 +50,47 @@ describe('ConfigurationController', () => {
         const result = await controller.getById({ id: mockId });
 
         expect(result).toEqual(mockResult);
+      });
+    });
+
+    describe('update', () => {
+      it('should update configuration by id', async () => {
+        // Criar objetos mock para os parâmetros e o valor de retorno
+        const mockParams: UpdateParamsDTO = {
+          country: 'Brazil',
+          tenant: 'exampleTenant',
+          id: '1',
+        };
+
+        const mockUpdateConfiguration: UpdateConfigurationDTO = {
+          country_iso: 1, // Substitua pelos valores reais que você precisa para o teste
+          operation_type: 1,
+          brand: 1,
+          name: 'Novo Nome',
+          description: 'Nova Descrição',
+          enabled: true,
+          version: 'Versão 2.0',
+        };
+
+        const mockResult = {};
+
+        // Mock do método update do serviço
+        jest.spyOn(service, 'update').mockResolvedValue(mockResult);
+
+        // Chamada do método do controlador
+        const result = await controller.update(
+          mockParams,
+          mockUpdateConfiguration,
+        );
+
+        // Verificação se o resultado retornado é igual ao valor esperado
+        expect(result).toEqual(mockResult);
+
+        // Verificação se o método update do serviço foi chamado com os parâmetros esperados
+        expect(service.update).toHaveBeenCalledWith(
+          mockParams,
+          mockUpdateConfiguration,
+        );
       });
     });
   });
