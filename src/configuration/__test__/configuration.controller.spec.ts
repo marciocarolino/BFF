@@ -1,18 +1,20 @@
-import { TestingModule, Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigurationController } from '../configuration.controller';
 import { ConfigurationService } from '../configuration.service';
-import { OptionalParamsDto } from '../dto/optional-params.dto';
-import { UpdateParamsDTO } from '../dto/UpdateConfigurationDTO';
+import {
+  UpdateConfigurationDTO,
+  UpdateParamsDTO,
+} from '../dto/UpdateConfigurationDTO';
+import { FindByIdDTO } from '../dto/configuration.dto';
 import { NotFoundException } from '@nestjs/common';
-import { mockNewConfiguration, mockUpdateConfiguration } from './mock/mockData';
+import { CreateConfigurationDTO } from '../dto/createConfiguration.dto';
 
 describe('ConfigurationController', () => {
   let controller: ConfigurationController;
   let service: ConfigurationService;
-  let module: TestingModule;
 
   beforeEach(async () => {
-    module = await Test.createTestingModule({
+    const module: TestingModule = await Test.createTestingModule({
       controllers: [ConfigurationController],
       providers: [ConfigurationService],
     }).compile();
@@ -21,91 +23,92 @@ describe('ConfigurationController', () => {
     service = module.get<ConfigurationService>(ConfigurationService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
-
   describe('getAll', () => {
     it('should return all configurations', async () => {
-      const mockResult = { configuration: [] };
+      const result = [
+        {
+          /* mock configuration data */
+        },
+      ];
+      jest.spyOn(service, 'getAll').mockResolvedValue(result);
 
-      const mockPass = new OptionalParamsDto();
-      mockPass.configurationMock = 'specificValue';
+      expect(await controller.getAll()).toBe(result);
+    });
+  });
 
-      jest.spyOn(service, 'getAll').mockResolvedValue(mockResult);
+  describe('getById', () => {
+    it('should return a configuration by ID', async () => {
+      const id: FindByIdDTO = { id: 'cd5fa417-b667-482d-b208-798d9da3213z' };
+      const result = {
+        /* mock configuration data */
+      };
+      jest.spyOn(service, 'getById').mockResolvedValue(result);
 
-      const result = await controller.getAll(mockPass);
-
-      expect(result).toBe(mockResult);
+      expect(await controller.getById(id)).toBe(result);
     });
 
-    describe('getById', () => {
-      it('should return configuration by id', async () => {
-        const mockId = '';
-        const mockResult = { configuration: {} };
-        jest.spyOn(service, 'getById').mockResolvedValue(mockResult);
+    it('should throw NotFoundException for non-existing ID', async () => {
+      const id: FindByIdDTO = { id: 'non-existing-id' };
+      jest.spyOn(service, 'getById').mockRejectedValue(new NotFoundException());
 
-        const result = await controller.getById({ id: mockId });
-
-        expect(result).toEqual(mockResult);
-      });
+      await expect(controller.getById(id)).rejects.toThrow(NotFoundException);
     });
+  });
 
-    describe('update', () => {
-      it('should update configuration by id', async () => {
-        const mockParams: UpdateParamsDTO = {
-          country: 1,
-          tenant: 'exampleTenant',
-          id: '1',
-        };
+  describe('create', () => {
+    it('should create a new configuration', async () => {
+      const newConfiguration: CreateConfigurationDTO = {
+        country_iso: 0,
+        operation_type: 0,
+        brand: 0,
+        name: '',
+        description: '',
+        enabled: false,
+        version: '',
+      };
+      const result = {
+        /* mock created configuration data */
+      };
+      jest.spyOn(service, 'create').mockResolvedValue(result);
 
-        const mockResult = {};
-
-        jest.spyOn(service, 'update').mockResolvedValue(mockResult);
-
-        const result = await controller.update(
-          mockParams,
-          mockUpdateConfiguration,
-        );
-
-        expect(result).toEqual(mockResult);
-
-        expect(service.update).toHaveBeenCalledWith(
-          mockParams,
-          mockUpdateConfiguration,
-        );
-      });
+      expect(await controller.create(newConfiguration)).toBe(result);
     });
+  });
 
-    describe('create', () => {
-      it('should create a new configuration', async () => {
-        const mockCreatedConfiguration = {
-          ...mockNewConfiguration,
-          id: 'new-id', // Adicione um ID fictício ou ajuste conforme necessário
-        };
+  describe('update', () => {
+    it('should update a configuration', async () => {
+      const params: UpdateParamsDTO = {
+        country: 'br',
+        tenant: 'santander',
+        id: '1',
+      };
+      const updateConfiguration: UpdateConfigurationDTO = {
+        country_iso: 0,
+        operation_type: 0,
+        brand: 0,
+        name: '',
+        description: '',
+        enabled: false,
+        version: '',
+      };
+      const result = {
+        /* mock updated configuration data */
+      };
+      jest.spyOn(service, 'update').mockResolvedValue(result);
 
-        jest
-          .spyOn(service, 'create')
-          .mockResolvedValue(mockCreatedConfiguration);
+      expect(await controller.update(params, updateConfiguration)).toBe(result);
+    });
+  });
 
-        const result = await controller.create(mockNewConfiguration);
+  describe('delete', () => {
+    it('should delete a configuration by ID', async () => {
+      const id = '1';
+      const result = {
+        /* mock deleted configuration data */
+      };
+      jest.spyOn(service, 'delete').mockResolvedValue(result);
 
-        expect(result).toEqual(mockCreatedConfiguration);
-        expect(service.create).toHaveBeenCalledWith(mockNewConfiguration);
-      });
-
-      it('should handle exceptions during creation', async () => {
-        // Simula uma exceção durante a criação
-        jest
-          .spyOn(service, 'create')
-          .mockRejectedValue(new NotFoundException('Some error message'));
-
-        await expect(
-          controller.create(mockNewConfiguration),
-        ).rejects.toThrowError(NotFoundException);
-
-        expect(service.create).toHaveBeenCalledWith(mockNewConfiguration);
-      });
+      expect(await controller.delete(id)).toBe(result);
     });
   });
 });

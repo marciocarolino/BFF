@@ -2,7 +2,6 @@ import {
   Param,
   Controller,
   Get,
-  Query,
   Put,
   Body,
   Post,
@@ -11,7 +10,6 @@ import {
 import { ConfigurationService } from './configuration.service';
 import { ApiTags } from '@nestjs/swagger';
 import { FindByIdDTO } from './dto/configuration.dto';
-import { OptionalParamsDto } from './dto/optional-params.dto';
 import {
   UpdateConfigurationDTO,
   UpdateParamsDTO,
@@ -24,8 +22,8 @@ export class ConfigurationController {
   constructor(private readonly configurationService: ConfigurationService) {}
 
   @Get()
-  async getAll(@Query() params?: OptionalParamsDto): Promise<any> {
-    return await this.configurationService.getAll(params);
+  async getAll(): Promise<any> {
+    return await this.configurationService.getAll();
   }
 
   @Get(':id')
