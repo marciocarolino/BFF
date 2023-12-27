@@ -27,6 +27,6 @@ export class AppService {
     const document = SwaggerModule.createDocument(app, config, options);
     SwaggerModule.setup('api', app, document);
 
-    await app.listen(3000);
+    await app.listen(process.env.PORT || 3001);
   }
 }

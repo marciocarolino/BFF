@@ -9,11 +9,7 @@ import {
 } from '@nestjs/common';
 import { ConfigurationService } from './configuration.service';
 import { ApiTags } from '@nestjs/swagger';
-import { FindByIdDTO } from './dto/configuration.dto';
-import {
-  UpdateConfigurationDTO,
-  UpdateParamsDTO,
-} from './dto/UpdateConfigurationDTO';
+import { UpdateConfigurationDTO } from './dto/UpdateConfigurationDTO';
 import { CreateConfigurationDTO } from './dto/createConfiguration.dto';
 
 @Controller('configuration')
@@ -27,7 +23,7 @@ export class ConfigurationController {
   }
 
   @Get(':id')
-  async getById(@Param() id: FindByIdDTO): Promise<FindByIdDTO> {
+  async getById(@Param('id') id: string): Promise<any> {
     return await this.configurationService.getById(id);
   }
 
@@ -38,10 +34,10 @@ export class ConfigurationController {
 
   @Put(':id')
   async update(
-    @Param() params: UpdateParamsDTO,
+    @Param('id') id: string,
     @Body() updateConfiguration: UpdateConfigurationDTO,
   ): Promise<any> {
-    return await this.configurationService.update(params, updateConfiguration);
+    return await this.configurationService.update(id, updateConfiguration);
   }
 
   @Delete(':id')

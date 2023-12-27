@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-
-import { FindByIdDTO } from './dto/configuration.dto';
 import { UpdateParamsDTO } from './dto/UpdateConfigurationDTO';
 
 import { CreateConfigurationDTO } from './dto/createConfiguration.dto';
@@ -19,7 +17,7 @@ export class ConfigurationService {
         result = response.data.docs.map((resultConfiguration) => {
           return {
             id: resultConfiguration.id,
-            country_id: resultConfiguration.country_iso,
+            country_iso: resultConfiguration.country_iso,
             operation_type: resultConfiguration.operation_type,
             brand: resultConfiguration.brand,
             name: resultConfiguration.name,
@@ -36,23 +34,30 @@ export class ConfigurationService {
     }
   }
 
-  async getById(id: FindByIdDTO): Promise<any> {
-    const response = await this.getAll();
-
-    const configurations = Array.isArray(response.data)
-      ? response.data.flat()
-      : [];
-
-    const configuration = configurations.filter(
-      (config) => config.id === id.id,
-    );
-    return configuration;
+  async getById(id: string): Promise<any> {
+    const response = await axios.get(`${process.env.API}/configuration/${id}`, {
+      headers: { country: 'br', tenant: 'santander' },
+    });
+    if (response?.data) {
+      const resultConfiguration = response.data;
+      return {
+        id: resultConfiguration.id,
+        country_iso: resultConfiguration.country_iso,
+        operation_type: resultConfiguration.operation_type,
+        brand: resultConfiguration.brand,
+        name: resultConfiguration.name,
+        description: resultConfiguration.description,
+        version: resultConfiguration.version,
+        enabled: resultConfiguration.enabled,
+      };
+    }
+    return {};
   }
 
   async create(newConfiguration: CreateConfigurationDTO): Promise<any> {
     try {
       const response = await axios.post(
-        `${process.env.API}/configurations`,
+        `${process.env.API}/configuration`,
         newConfiguration,
         { headers: { country: 'br', tenant: 'santander' } },
       );
@@ -62,24 +67,27 @@ export class ConfigurationService {
     }
   }
 
-  async update(
-    params: UpdateParamsDTO,
-    updateConfiguration: any,
-  ): Promise<any> {
+  async update(id: string, updateConfiguration: any): Promise<any> {
     const response = await axios.put(
-      `${process.env.API}/configurations/${params.country}/${params.tenant}/${params.id}`,
+      `${process.env.API}/configuration/${id}`,
       updateConfiguration,
       { headers: { country: 'br', tenant: 'santander' } },
     );
-
     return response.data;
   }
 
   async delete(id: string): Promise<any> {
-    const response = await axios.delete(
-      `${process.env.API}/configurations/${id}`,
-      { headers: { country: 'br', tenant: 'santander' } },
-    );
-    return response.data;
+    console.log({ id });
+    try {
+      const response = await axios.delete(
+        `${process.env.API}/configuration/${id}`,
+        { headers: { country: 'br', tenant: 'santander' } },
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error('Error delete config', error);
+      throw error;
+    }
   }
 }

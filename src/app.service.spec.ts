@@ -44,6 +44,6 @@ describe('AppService', () => {
       expect.any(Object),
     );
     expect(setupMock).toHaveBeenCalledWith('api', appMock, expect.any(Object));
-    expect(appMock.listen).toHaveBeenCalledWith(3000);
+    expect(appMock.listen).toHaveBeenCalledWith(3001);
   });
 });

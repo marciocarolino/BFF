@@ -37,10 +37,10 @@ export class UpdateConfigurationDTO {
 
 export class UpdateParamsDTO {
   @ApiProperty({ description: 'Country' })
-  country: string;
+  country?: string;
 
   @ApiProperty({ description: 'Tenant' })
-  tenant: string;
+  tenant?: string;
 
   @ApiProperty({ description: 'Configuration ID' })
   id: string;

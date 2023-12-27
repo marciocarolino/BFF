@@ -17,6 +17,7 @@ export class TagService {
       if (response?.data.docs) {
         result = response.data.docs.map((resultTag) => {
           return {
+            id: resultTag.id,
             id_configuration: resultTag.id_configuration,
             name: resultTag.name,
             description: resultTag.description,
@@ -44,25 +45,24 @@ export class TagService {
         headers: { country: 'br', tenant: 'santander' },
       });
 
-      let result = null;
-      if (response?.data.docs) {
-        result = response.data.docs.map((resultTag) => {
-          return {
-            id_configuration: resultTag.id_configuration,
-            name: result.name,
-            description: result.description,
-            path_in: result.path_in,
-            path_out: result.path_out,
-            type_tag: result.type_tag,
-            variable_data: result.variable_data,
-            position_iso: result.position_iso,
-            size: result.size,
-            active: result.active,
-          };
-        });
+      if (response?.data) {
+        const result = response.data;
+        return {
+          id: result.id,
+          id_configuration: result.id_configuration,
+          name: result.name,
+          description: result.description,
+          path_in: result.path_in,
+          path_out: result.path_out,
+          type_tag: result.type_tag,
+          variable_data: result.variable_data,
+          position_iso: result.position_iso,
+          size: result.size,
+          active: result.active,
+        };
       }
 
-      return result;
+      return {};
     } catch (error) {
       console.error('Error fetching Tag', error);
       return [];
@@ -80,13 +80,13 @@ export class TagService {
     }
   }
 
-  async update(id: any, updateTag: UpdateTagDto): Promise<any> {
+  async update(id: string, updateTag: UpdateTagDto): Promise<any> {
     const response = await axios.put(
-      `${process.env.API}/configurations/${id}`,
+      `${process.env.API}/tag/${id}`,
       updateTag,
       { headers: { country: 'br', tenant: 'santander' } },
     );
-
+    console.error({ response });
     return response.data;
   }
 
