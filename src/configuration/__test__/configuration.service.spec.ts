@@ -1,17 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigurationService } from '../configuration.service';
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import { UpdateParamsDTO } from '../dto/updateConfiguration.dto';
-import { CreateConfigurationDTO } from '../dto/createConfiguration.dto';
+
+jest.mock('axios');
 
 describe('ConfigurationService', () => {
   let service: ConfigurationService;
-  let axiosMock: MockAdapter;
-
-  beforeAll(() => {
-    process.env.API = 'http://localhost';
-  });
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -19,33 +13,13 @@ describe('ConfigurationService', () => {
     }).compile();
 
     service = module.get<ConfigurationService>(ConfigurationService);
-    axiosMock = new MockAdapter(axios);
   });
 
-  afterEach(() => {
-    axiosMock.reset();
-  });
-
-  afterAll(() => {
-    jest.resetAllMocks();
+  it('should be defined', () => {
+    expect(service).toBeDefined();
   });
 
   describe('getAll', () => {
-    it('should return configurations', async () => {
-      const mockResponse = {
-        data: {
-          docs: null,
-        },
-      };
-      axiosMock
-        .onGet(`${process.env.API}/configuration`)
-        .reply(200, mockResponse);
-
-      const result = await service.getAll();
-
-      expect(result || []).toEqual([]);
-    });
-
     it('should fetch configurations successfully', async () => {
       const mockResponseData = {
         docs: [
@@ -89,53 +63,23 @@ describe('ConfigurationService', () => {
       );
     });
 
-    it('should handle error and return an empty array', async () => {
-      axiosMock.onGet(`${process.env.API}/configuration`).reply(500);
+    it('should handle errors and return an empty array', async () => {
+      jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Mock Error'));
 
       const result = await service.getAll();
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${process.env.API}/configuration`,
+        {
+          headers: { country: 'br', tenant: 'santander' },
+        },
+      );
 
       expect(result).toEqual([]);
-    });
-
-    it('should handle null response and return an empty array', async () => {
-      const mockResponse = { data: { docs: null } };
-      axiosMock
-        .onGet(`${process.env.API}/configuration`)
-        .reply(200, mockResponse);
-
-      const result = await service.getAll();
-
-      expect(result || []).toEqual([]);
     });
   });
 
   describe('getById', () => {
-    it('should return configuration by ID', async () => {
-      const mockResponse = {
-        data: {
-          docs: [
-            {
-              id: 'cd5fa417-b667-482d-b208-798d9da3213z',
-            },
-          ],
-        },
-      };
-
-      jest
-        .spyOn(service, 'getAll')
-        .mockResolvedValueOnce({ data: { docs: [] } });
-
-      axiosMock
-        .onGet(`${process.env.API}/configuration`)
-        .reply(200, mockResponse);
-
-      const id = '1';
-
-      const result = await service.getById(id);
-
-      expect(result).toEqual([]);
-    });
-
     it('should fetch configuration by id successfully', async () => {
       const mockId = '1';
       const mockResponseData = {
@@ -174,132 +118,153 @@ describe('ConfigurationService', () => {
       });
     });
 
-    it('should handle null response and return an empty array', async () => {
-      axiosMock
-        .onGet(`${process.env.API}/configuration`)
-        .reply(200, { data: { docs: null } });
+    it('should handle missing data and return an empty object', async () => {
+      const mockId = '2';
 
-      jest.spyOn(service, 'getAll').mockResolvedValue([]);
+      jest.spyOn(axios, 'get').mockResolvedValueOnce({
+        data: null,
+      });
 
-      const id = '1';
+      const result = await service.getById(mockId);
 
-      const result = await service.getById(id);
+      expect(axios.get).toHaveBeenCalledWith(
+        `${process.env.API}/configuration/${mockId}`,
+        {
+          headers: { country: 'br', tenant: 'santander' },
+        },
+      );
 
-      expect(result).toEqual([]);
+      expect(result).toEqual({});
     });
   });
 
   describe('create', () => {
-    it('should create a new configuration', async () => {
-      const mockNewConfiguration: CreateConfigurationDTO = {
-        country_iso: '1',
-        operation_type: '2',
-        brand: '1',
+    it('should create a new configuration successfully', async () => {
+      const mockNewConfiguration = {
+        country_iso: 'BR',
+        operation_type: 'buy',
+        brand: 'brand',
         name: 'New Configuration',
         description: 'Description of the new configuration',
         enabled: true,
         version: '1.0',
       };
-      const mockResponse = {
-        data: {},
+
+      const mockResponseData = {
+        id: '1',
+        ...mockNewConfiguration,
       };
-      axiosMock
-        .onPost(`${process.env.API}/configurations`)
-        .reply(201, mockResponse);
+
+      jest.spyOn(axios, 'post').mockResolvedValueOnce({
+        data: mockResponseData,
+      });
 
       const result = await service.create(mockNewConfiguration);
 
-      expect(result).toEqual({
-        data: mockResponse.data,
-      });
+      expect(axios.post).toHaveBeenCalledWith(
+        `${process.env.API}/configuration`,
+        mockNewConfiguration,
+        {
+          headers: { country: 'br', tenant: 'santander' },
+        },
+      );
+
+      expect(result).toEqual(mockResponseData);
     });
 
-    it('should handle error and throw an error', async () => {
-      const mockNewConfiguration: CreateConfigurationDTO = {
-        country_iso: '1',
-        operation_type: '2',
-        brand: '1',
+    it('should handle errors and throw an error', async () => {
+      const mockNewConfiguration = {
+        country_iso: 'BR',
+        operation_type: 'buy',
+        brand: 'brand',
         name: 'New Configuration',
         description: 'Description of the new configuration',
         enabled: true,
         version: '1.0',
       };
-      axiosMock.onPost(`${process.env.API}/configurations`).reply(500);
 
-      await expect(service.create(mockNewConfiguration)).rejects.toThrowError();
+      jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Mock Error'));
+
+      await expect(service.create(mockNewConfiguration)).rejects.toThrowError(
+        'Mock Error',
+      );
     });
   });
 
   describe('update', () => {
-    it('should update a configuration', async () => {
-      const mockParams: UpdateParamsDTO = {
-        country: 'br',
-        tenant: 'santander',
-        id: '1',
+    it('should update a configuration successfully', async () => {
+      const mockId = '1';
+      const mockUpdateConfiguration = {
+        name: 'Updated Configuration',
+        description: 'Updated description',
       };
-      const id = '1';
-      const mockUpdateConfiguration = {};
-      const mockResponse = {
-        data: {},
+
+      const mockResponseData = {
+        id: mockId,
+        country_iso: 'BR',
+        operation_type: 'buy',
+        brand: 'brand',
+        name: mockUpdateConfiguration.name,
+        description: mockUpdateConfiguration.description,
+        version: '1.0',
+        enabled: true,
       };
-      axiosMock
-        .onPut(
-          `${process.env.API}/configurations/${mockParams.country}/${mockParams.tenant}/${mockParams.id}`,
-        )
-        .reply(200, mockResponse);
 
-      const result = await service.update(id, mockUpdateConfiguration);
-
-      expect(result).toEqual({
-        data: mockResponse.data,
+      jest.spyOn(axios, 'put').mockResolvedValueOnce({
+        data: mockResponseData,
       });
+
+      const result = await service.update(mockId, mockUpdateConfiguration);
+
+      expect(axios.put).toHaveBeenCalledWith(
+        `${process.env.API}/configuration/${mockId}`,
+        mockUpdateConfiguration,
+        { headers: { country: 'br', tenant: 'santander' } },
+      );
+
+      expect(result).toEqual(mockResponseData);
     });
 
-    it('should handle error and throw an error', async () => {
-      const mockParams: UpdateParamsDTO = {
-        country: 'br',
-        tenant: 'santander',
-        id: '1',
+    it('should handle errors and throw an error', async () => {
+      const mockId = '2';
+      const mockUpdateConfiguration = {
+        name: 'Updated Configuration',
+        description: 'Updated description',
       };
-      const id = '1';
-      const mockUpdateConfiguration = {};
-      axiosMock
-        .onPut(
-          `${process.env.API}/configurations/${mockParams.country}/${mockParams.tenant}/${mockParams.id}`,
-        )
-        .reply(500);
 
-      // Expectativa
+      jest.spyOn(axios, 'put').mockRejectedValueOnce(new Error('Mock Error'));
+
       await expect(
-        service.update(id, mockUpdateConfiguration),
-      ).rejects.toThrowError();
+        service.update(mockId, mockUpdateConfiguration),
+      ).rejects.toThrowError('Mock Error');
     });
   });
-
   describe('delete', () => {
-    it('should delete a configuration by ID', async () => {
+    it('should delete a configuration successfully', async () => {
       const mockId = '1';
-      const mockResponse = {
-        data: {},
-      };
-      axiosMock
-        .onDelete(`${process.env.API}/configurations/${mockId}`)
-        .reply(204, mockResponse);
+
+      jest.spyOn(axios, 'delete').mockResolvedValueOnce({
+        data: { id: mockId },
+      });
 
       const result = await service.delete(mockId);
 
-      expect(result).toEqual({
-        data: mockResponse.data,
-      });
+      expect(axios.delete).toHaveBeenCalledWith(
+        `${process.env.API}/configuration/${mockId}`,
+        { headers: { country: 'br', tenant: 'santander' } },
+      );
+
+      expect(result).toEqual({ id: mockId });
     });
 
-    it('should handle error and throw an error', async () => {
-      const mockId = '1';
-      axiosMock
-        .onDelete(`${process.env.API}/configurations/${mockId}`)
-        .reply(500);
+    it('should handle errors and throw an error', async () => {
+      const mockId = '2';
 
-      await expect(service.delete(mockId)).rejects.toThrowError();
+      jest
+        .spyOn(axios, 'delete')
+        .mockRejectedValueOnce(new Error('Mock Error'));
+
+      await expect(service.delete(mockId)).rejects.toThrowError('Mock Error');
     });
   });
 });
