@@ -86,9 +86,9 @@ describe('ConfigurationService', () => {
         .onGet(`${process.env.API}/configuration`)
         .reply(200, mockResponse);
 
-      const result = await service.getById({
-        id: 'cd5fa417-b667-482d-b208-798d9da3213z',
-      });
+      const id = '1';
+
+      const result = await service.getById(id);
 
       expect(result).toEqual([]);
     });
@@ -100,9 +100,9 @@ describe('ConfigurationService', () => {
 
       jest.spyOn(service, 'getAll').mockResolvedValue([]);
 
-      const result = await service.getById({
-        id: 'cd5fa417-b667-482d-b208-798d9da3213z',
-      });
+      const id = '1';
+
+      const result = await service.getById(id);
 
       expect(result).toEqual([]);
     });
@@ -111,9 +111,9 @@ describe('ConfigurationService', () => {
   describe('create', () => {
     it('should create a new configuration', async () => {
       const mockNewConfiguration: CreateConfigurationDTO = {
-        country_iso: 1,
-        operation_type: 2,
-        brand: 1,
+        country_iso: '1',
+        operation_type: '2',
+        brand: '1',
         name: 'New Configuration',
         description: 'Description of the new configuration',
         enabled: true,
@@ -135,9 +135,9 @@ describe('ConfigurationService', () => {
 
     it('should handle error and throw an error', async () => {
       const mockNewConfiguration: CreateConfigurationDTO = {
-        country_iso: 1,
-        operation_type: 2,
-        brand: 1,
+        country_iso: '1',
+        operation_type: '2',
+        brand: '1',
         name: 'New Configuration',
         description: 'Description of the new configuration',
         enabled: true,
@@ -156,6 +156,7 @@ describe('ConfigurationService', () => {
         tenant: 'santander',
         id: '1',
       };
+      const id = '1';
       const mockUpdateConfiguration = {};
       const mockResponse = {
         data: {},
@@ -166,7 +167,7 @@ describe('ConfigurationService', () => {
         )
         .reply(200, mockResponse);
 
-      const result = await service.update(mockParams, mockUpdateConfiguration);
+      const result = await service.update(id, mockUpdateConfiguration);
 
       expect(result).toEqual({
         data: mockResponse.data,
@@ -179,6 +180,7 @@ describe('ConfigurationService', () => {
         tenant: 'santander',
         id: '1',
       };
+      const id = '1';
       const mockUpdateConfiguration = {};
       axiosMock
         .onPut(
@@ -188,7 +190,7 @@ describe('ConfigurationService', () => {
 
       // Expectativa
       await expect(
-        service.update(mockParams, mockUpdateConfiguration),
+        service.update(id, mockUpdateConfiguration),
       ).rejects.toThrowError();
     });
   });

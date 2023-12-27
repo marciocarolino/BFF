@@ -5,7 +5,6 @@ import {
   UpdateConfigurationDTO,
   UpdateParamsDTO,
 } from '../dto/UpdateConfigurationDTO';
-import { FindByIdDTO } from '../dto/configuration.dto';
 import { NotFoundException } from '@nestjs/common';
 import { CreateConfigurationDTO } from '../dto/createConfiguration.dto';
 
@@ -38,7 +37,7 @@ describe('ConfigurationController', () => {
 
   describe('getById', () => {
     it('should return a configuration by ID', async () => {
-      const id: FindByIdDTO = { id: 'cd5fa417-b667-482d-b208-798d9da3213z' };
+      const id = 'cd5fa417-b667-482d-b208-798d9da3213z';
       const result = {
         /* mock configuration data */
       };
@@ -48,7 +47,7 @@ describe('ConfigurationController', () => {
     });
 
     it('should throw NotFoundException for non-existing ID', async () => {
-      const id: FindByIdDTO = { id: 'non-existing-id' };
+      const id = 'non-existing-id';
       jest.spyOn(service, 'getById').mockRejectedValue(new NotFoundException());
 
       await expect(controller.getById(id)).rejects.toThrow(NotFoundException);
@@ -58,9 +57,9 @@ describe('ConfigurationController', () => {
   describe('create', () => {
     it('should create a new configuration', async () => {
       const newConfiguration: CreateConfigurationDTO = {
-        country_iso: 0,
-        operation_type: 0,
-        brand: 0,
+        country_iso: '0',
+        operation_type: '0',
+        brand: '0',
         name: '',
         description: '',
         enabled: false,
@@ -91,12 +90,13 @@ describe('ConfigurationController', () => {
         enabled: false,
         version: '',
       };
+      const id = '1';
       const result = {
         /* mock updated configuration data */
       };
       jest.spyOn(service, 'update').mockResolvedValue(result);
 
-      expect(await controller.update(params, updateConfiguration)).toBe(result);
+      expect(await controller.update(id, updateConfiguration)).toBe(result);
     });
   });
 
