@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ConfigurationService } from './configuration.service';
 import { ApiTags } from '@nestjs/swagger';
-import { UpdateConfigurationDTO } from './dto/UpdateConfigurationDTO';
+import { UpdateConfigurationDTO } from './dto/updateConfiguration.dto';
 import { CreateConfigurationDTO } from './dto/createConfiguration.dto';
 
 @Controller('configuration')

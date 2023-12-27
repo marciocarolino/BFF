@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { UpdateParamsDTO } from './dto/UpdateConfigurationDTO';
-
 import { CreateConfigurationDTO } from './dto/createConfiguration.dto';
 
 @Injectable()

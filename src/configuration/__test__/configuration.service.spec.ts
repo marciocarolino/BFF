@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigurationService } from '../configuration.service';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { UpdateParamsDTO } from '../dto/UpdateConfigurationDTO';
+import { UpdateParamsDTO } from '../dto/updateConfiguration.dto';
 import { CreateConfigurationDTO } from '../dto/createConfiguration.dto';
 
 describe('ConfigurationService', () => {
@@ -44,6 +44,49 @@ describe('ConfigurationService', () => {
       const result = await service.getAll();
 
       expect(result || []).toEqual([]);
+    });
+
+    it('should fetch configurations successfully', async () => {
+      const mockResponseData = {
+        docs: [
+          {
+            id: '1',
+            country_iso: 'BR',
+            operation_type: 'buy',
+            brand: 'brand',
+            name: 'Configuration 1',
+            description: 'Description 1',
+            version: '1.0',
+            enabled: true,
+          },
+        ],
+      };
+
+      jest.spyOn(axios, 'get').mockResolvedValueOnce({
+        data: mockResponseData,
+      });
+
+      const result = await service.getAll();
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${process.env.API}/configuration`,
+        {
+          headers: { country: 'br', tenant: 'santander' },
+        },
+      );
+
+      expect(result).toEqual(
+        mockResponseData.docs.map((resultConfiguration) => ({
+          id: resultConfiguration.id,
+          country_iso: resultConfiguration.country_iso,
+          operation_type: resultConfiguration.operation_type,
+          brand: resultConfiguration.brand,
+          name: resultConfiguration.name,
+          description: resultConfiguration.description,
+          version: resultConfiguration.version,
+          enabled: resultConfiguration.enabled,
+        })),
+      );
     });
 
     it('should handle error and return an empty array', async () => {
@@ -91,6 +134,44 @@ describe('ConfigurationService', () => {
       const result = await service.getById(id);
 
       expect(result).toEqual([]);
+    });
+
+    it('should fetch configuration by id successfully', async () => {
+      const mockId = '1';
+      const mockResponseData = {
+        id: '1',
+        country_iso: 'BR',
+        operation_type: 'buy',
+        brand: 'brand',
+        name: 'Configuration 1',
+        description: 'Description 1',
+        version: '1.0',
+        enabled: true,
+      };
+
+      jest.spyOn(axios, 'get').mockResolvedValueOnce({
+        data: mockResponseData,
+      });
+
+      const result = await service.getById(mockId);
+
+      expect(axios.get).toHaveBeenCalledWith(
+        `${process.env.API}/configuration/${mockId}`,
+        {
+          headers: { country: 'br', tenant: 'santander' },
+        },
+      );
+
+      expect(result).toEqual({
+        id: mockResponseData.id,
+        country_iso: mockResponseData.country_iso,
+        operation_type: mockResponseData.operation_type,
+        brand: mockResponseData.brand,
+        name: mockResponseData.name,
+        description: mockResponseData.description,
+        version: mockResponseData.version,
+        enabled: mockResponseData.enabled,
+      });
     });
 
     it('should handle null response and return an empty array', async () => {
