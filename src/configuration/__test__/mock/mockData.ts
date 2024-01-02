@@ -1,4 +1,4 @@
-import { UpdateConfigurationDTO } from '../../dto/updateConfiguration.dto';
+import { UpdateConfigurationDTO } from 'src/configuration/dto/UpdateConfigurationDTO';
 
 export const mockConfigurations = {
   configuration: [

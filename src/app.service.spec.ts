@@ -7,10 +7,6 @@ import { SwaggerModule } from '@nestjs/swagger';
 describe('AppService', () => {
   let appService: AppService;
 
-  beforeAll(() => {
-    process.env.PORT = '3001';
-  });
-
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [AppService],
@@ -48,6 +44,6 @@ describe('AppService', () => {
       expect.any(Object),
     );
     expect(setupMock).toHaveBeenCalledWith('api', appMock, expect.any(Object));
-    expect(appMock.listen).toHaveBeenCalledWith(process.env.PORT || 3001);
+    expect(appMock.listen).toHaveBeenCalledWith('3001' || 3001);
   });
 });

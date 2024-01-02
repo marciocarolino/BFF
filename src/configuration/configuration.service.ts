@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException } from '@nestjs/common';
 import axios from 'axios';
+import { UpdateParamsDTO } from './dto/UpdateConfigurationDTO';
+
 import { CreateConfigurationDTO } from './dto/createConfiguration.dto';
 
 @Injectable()
@@ -60,18 +62,22 @@ export class ConfigurationService {
         { headers: { country: 'br', tenant: 'santander' } },
       );
       return response.data;
-    } catch (error) {
-      throw error;
+    } catch ({ response }) {
+      throw new HttpException(response.data?.message, response?.status);
     }
   }
 
   async update(id: string, updateConfiguration: any): Promise<any> {
-    const response = await axios.put(
-      `${process.env.API}/configuration/${id}`,
-      updateConfiguration,
-      { headers: { country: 'br', tenant: 'santander' } },
-    );
-    return response.data;
+    try {
+      const response = await axios.put(
+        `${process.env.API}/configuration/${id}`,
+        updateConfiguration,
+        { headers: { country: 'br', tenant: 'santander' } },
+      );
+      return response.data;
+    } catch ({ response }) {
+      throw new HttpException(response.data?.message, response?.status);
+    }
   }
 
   async delete(id: string): Promise<any> {
@@ -83,9 +89,8 @@ export class ConfigurationService {
       );
 
       return response.data;
-    } catch (error) {
-      console.error('Error delete config', error);
-      throw error;
+    } catch ({ response }) {
+      throw new HttpException(response.data?.message, response?.status);
     }
   }
 }

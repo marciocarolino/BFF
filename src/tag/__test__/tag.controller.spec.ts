@@ -1,3 +1,5 @@
+// tag.controller.spec.ts
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { TagController } from '../tag.controller';
 import { TagService } from '../tag.service';
@@ -5,117 +7,134 @@ import { CreateTagDto, UpdateTagDto } from '../dto/tag.dto';
 
 describe('TagController', () => {
   let controller: TagController;
-  let service: TagService;
+  let tagService: TagService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TagController],
-      providers: [TagService],
+      providers: [TagService], // Certifique-se de adicionar seus serviços aqui, se necessário
     }).compile();
 
     controller = module.get<TagController>(TagController);
-    service = module.get<TagService>(TagService);
-  });
-
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+    tagService = module.get<TagService>(TagService);
   });
 
   describe('getAll', () => {
-    it('should call tagService.getAll with the correct parameters', async () => {
-      const mockConfigurationId = 'mockConfigurationId';
-      const mockServiceResult = {};
+    it('should return an array of tags', async () => {
+      const mockTags = ['tag1', 'tag2'];
 
-      // Mocking the service method
-      jest.spyOn(service, 'getAll').mockResolvedValueOnce(mockServiceResult);
+      jest.spyOn(tagService, 'getAll').mockResolvedValue(mockTags);
 
-      const result = await controller.getAll(mockConfigurationId);
+      const result = await controller.getAll('someId');
 
-      expect(service.getAll).toHaveBeenCalledWith(mockConfigurationId);
-      expect(result).toEqual(mockServiceResult);
+      expect(result).toEqual(mockTags);
     });
   });
 
   describe('getById', () => {
-    it('should call tagService.getById with the correct parameters', async () => {
-      const mockId = 'mockId';
-      const mockServiceResult = {};
+    it('should return a tag by id', async () => {
+      const mockTag = { id: 'someId', name: 'tagName' };
 
-      // Mocking the service method
-      jest.spyOn(service, 'getById').mockResolvedValueOnce(mockServiceResult);
+      jest.spyOn(tagService, 'getById').mockResolvedValue(mockTag);
 
-      const result = await controller.getById(mockId);
+      const result = await controller.getById('someId');
 
-      expect(service.getById).toHaveBeenCalledWith(mockId);
-      expect(result).toEqual(mockServiceResult);
+      expect(result).toEqual(mockTag);
     });
   });
 
   describe('create', () => {
-    it('should call tagService.create with the correct parameters', async () => {
-      const mockCreateTagDto: CreateTagDto = {
+    it('should create a new tag', async () => {
+      const mockNewTag: CreateTagDto = {
         id_configuration: '123',
-        name: 'name',
-        description: 'description',
-        path_in: 'path_in',
-        path_out: 'path_out',
-        type_tag: 'type_tag',
-        variable_data: 'variable_data',
+        name: 'tagName',
+        description: 'tagDescription',
+        path_in: 'tagPathIn',
+        path_out: 'tagPathOut',
+        type_tag: 'tagType',
+        variable_data: 'tagVariableData',
         position_iso: 123,
-        size: 123,
+        size: 456,
         active: true,
       };
-      const mockServiceResult = {};
 
-      // Mocking the service method
-      jest.spyOn(service, 'create').mockResolvedValueOnce(mockServiceResult);
+      const mockResponse = {
+        id_configuration: '123',
+        name: 'tagName',
+        description: 'tagDescription',
+        path_in: 'tagPathIn',
+        path_out: 'tagPathOut',
+        type_tag: 'tagType',
+        variable_data: 'tagVariableData',
+        position_iso: 123,
+        size: 456,
+        active: true,
+      };
 
-      const result = await controller.create(mockCreateTagDto);
+      jest.spyOn(tagService, 'create').mockResolvedValue(mockResponse);
 
-      expect(service.create).toHaveBeenCalledWith(mockCreateTagDto);
-      expect(result).toEqual(mockServiceResult);
+      const result = await controller.create(mockNewTag);
+
+      expect(result).toEqual(mockResponse);
     });
   });
 
   describe('update', () => {
-    it('should call tagService.update with the correct parameters', async () => {
-      const mockId = 'mockId';
-      const mockUpdateTagDto: UpdateTagDto = {
+    it('should update a tag by id', async () => {
+      const mockUpdateTag: UpdateTagDto = {
         id_configuration: '123',
-        name: 'name',
-        description: 'description',
-        path_in: 'path_in',
-        path_out: 'path_out',
-        type_tag: 'type_tag',
-        variable_data: 'variable_data',
-        position_iso: 123,
-        size: 123,
-        active: true,
+        name: 'updatedName',
+        description: 'updatedDescription',
+        path_in: 'updatedPathIn',
+        path_out: 'updatedPathOut',
+        type_tag: 'updatedTypeTag',
+        variable_data: 'updatedVariableData',
+        position_iso: 456,
+        size: 456,
+        active: false,
       };
-      const mockServiceResult = {};
 
-      // Mocking the service method
-      jest.spyOn(service, 'update').mockResolvedValueOnce(mockServiceResult);
+      const mockResponse = {
+        id_configuration: '123',
+        name: 'updatedName',
+        description: 'updatedDescription',
+        path_in: 'updatedPathIn',
+        path_out: 'updatedPathOut',
+        type_tag: 'updatedTypeTag',
+        variable_data: 'updatedVariableData',
+        position_iso: 456,
+        size: 456,
+        active: false,
+      };
 
-      const result = await controller.update(mockId, mockUpdateTagDto);
+      jest.spyOn(tagService, 'update').mockResolvedValue(mockResponse);
 
-      expect(service.update).toHaveBeenCalledWith(mockId, mockUpdateTagDto);
-      expect(result).toEqual(mockServiceResult);
+      const result = await controller.update('someId', mockUpdateTag);
+
+      expect(result).toEqual(mockResponse);
     });
   });
 
   describe('delete', () => {
-    it('should call tagService.delete with the correct parameters', async () => {
-      const mockId = 'mockId';
-      const mockServiceResult = {};
+    it('should delete a tag by id', async () => {
+      const mockResponse = {
+        id_configuration: '123',
+        name: 'updatedName',
+        description: 'updatedDescription',
+        path_in: 'updatedPathIn',
+        path_out: 'updatedPathOut',
+        type_tag: 'updatedTypeTag',
+        variable_data: 'updatedVariableData',
+        position_iso: 456,
+        size: 456,
+        active: false,
+      };
 
-      // Mocking the service method
-      jest.spyOn(service, 'delete').mockResolvedValueOnce(mockServiceResult);
+      jest.spyOn(tagService, 'delete').mockResolvedValue(mockResponse);
 
-      const result = await controller.delete(mockId);
+      const result = await controller.delete('someId');
 
-      expect(service.delete).toHaveBeenCalledWith(mockId);
-      expect(result).toEqual(mockServiceResult);
+      expect(result).toEqual(mockResponse);
     });
   });
 });

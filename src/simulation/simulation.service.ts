@@ -13,10 +13,6 @@ export class SimulationService {
           headers: { country: 'br', tenant: 'santander' },
         },
       );
-
-      if (response.status === 201) {
-        response.status = 200;
-      }
       return response.data;
     } catch (error) {
       throw error;

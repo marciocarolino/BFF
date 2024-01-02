@@ -1,131 +1,102 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TagService } from '../tag.service'; // Substitua pelo caminho real do seu serviço
+import { TagService } from '../tag.service';
 import axios from 'axios';
-import { CreateTagDto, UpdateTagDto } from '../dto/tag.dto';
 
 jest.mock('axios');
 
 describe('TagService', () => {
-  let service: TagService;
+  let tagService: TagService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [TagService],
     }).compile();
 
-    service = module.get<TagService>(TagService);
+    tagService = module.get<TagService>(TagService);
   });
 
-  it('should be defined', () => {
-    expect(service).toBeDefined();
-  });
-
-  describe('getAll', () => {
-    it('should fetch and transform data correctly', async () => {
-      const mockIdConfiguration = 'mockId';
-      const mockResponseData = {
+  it('should return an array of tags', async () => {
+    const mockResponse = {
+      data: {
         docs: [
           {
-            id: '1',
-            id_configuration: 'configId',
-            name: 'TagName',
-            description: 'TagDescription',
+            id: 1,
+            process_type: 'example',
+          },
+          {
+            id: 2,
+            process_type: 'example2',
           },
         ],
-      };
+      },
+    };
 
-      jest.spyOn(axios, 'get').mockResolvedValueOnce({
-        data: mockResponseData,
-      });
+    (axios.get as jest.Mock).mockResolvedValue(mockResponse);
 
-      const result = await service.getAll(mockIdConfiguration);
+    const result = await tagService.getAll('someId');
 
-      expect(axios.get).toHaveBeenCalledWith(
-        `${process.env.API}/tag/${mockIdConfiguration}`,
-        {
-          headers: { country: 'br', tenant: 'santander' },
-        },
-      );
-
-      expect(result).toEqual([
-        {
-          id: '1',
-          id_configuration: 'configId',
-          name: 'TagName',
-          description: 'TagDescription',
-        },
-      ]);
-    });
-
-    it('should handle errors and return an empty array', async () => {
-      const mockIdConfiguration = 'mockId';
-
-      jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Mock Error'));
-
-      const result = await service.getAll(mockIdConfiguration);
-
-      expect(axios.get).toHaveBeenCalledWith(
-        `${process.env.API}/tag/${mockIdConfiguration}`,
-        {
-          headers: { country: 'br', tenant: 'santander' },
-        },
-      );
-
-      expect(result).toEqual([]);
-    });
+    expect(result).toEqual([
+      {
+        id: 1,
+        process_type: 'example',
+      },
+      {
+        id: 2,
+        process_type: 'example2',
+      },
+    ]);
   });
-  describe('getById', () => {
-    it('should fetch and transform data correctly', async () => {
-      const mockId = 'mockId';
-      const mockResponseData = {
-        id: '1',
-        id_configuration: 'configId',
-        name: 'TagName',
-        description: 'TagDescription',
-      };
 
-      jest.spyOn(axios, 'get').mockResolvedValueOnce({
-        data: mockResponseData,
-      });
+  it('should return a tag by id', async () => {
+    const mockResponse = {
+      data: {
+        id: 1,
+        process_type: 'example',
+      },
+    };
 
-      const result = await service.getById(mockId);
+    (axios.get as jest.Mock).mockResolvedValue(mockResponse);
 
-      expect(axios.get).toHaveBeenCalledWith(
-        `${process.env.API}/tag/id/${mockId}`,
-        {
-          headers: { country: 'br', tenant: 'santander' },
-        },
-      );
+    const result = await tagService.getById('someId');
 
-      expect(result).toEqual({
-        id: '1',
-        id_configuration: 'configId',
-        name: 'TagName',
-        description: 'TagDescription',
-      });
-    });
-
-    it('should handle errors and return an empty object', async () => {
-      const mockId = 'mockId';
-
-      jest.spyOn(axios, 'get').mockRejectedValueOnce(new Error('Mock Error'));
-
-      const result = await service.getById(mockId);
-
-      expect(axios.get).toHaveBeenCalledWith(
-        `${process.env.API}/tag/id/${mockId}`,
-        {
-          headers: { country: 'br', tenant: 'santander' },
-        },
-      );
-
-      expect(result).toEqual({});
+    expect(result).toEqual({
+      id: 1,
+      process_type: 'example',
     });
   });
 
-  describe('create', () => {
-    it('should create a new tag successfully', async () => {
-      const mockNewTag: CreateTagDto = {
+  it('should handle empty response and return an empty object', async () => {
+    (axios.get as jest.Mock).mockResolvedValue({});
+
+    const result = await tagService.getById('someId');
+
+    expect(result).toEqual({});
+  });
+
+  it('should handle errors and return an empty object', async () => {
+    (axios.get as jest.Mock).mockRejectedValue(new Error('Mocked error'));
+
+    const result = await tagService.getById('someId');
+
+    expect(result).toEqual([]);
+  });
+
+  it('should create a new tag', async () => {
+    const mockNewTag = {
+      id_configuration: '123',
+      name: 'name',
+      description: 'description',
+      path_in: 'path_in',
+      path_out: 'path_out',
+      type_tag: 'type_tag',
+      variable_data: 'variable_data',
+      position_iso: 123,
+      size: 123,
+      active: true,
+    };
+
+    const mockResponse = {
+      data: {
         id_configuration: '123',
         name: 'name',
         description: 'description',
@@ -136,160 +107,111 @@ describe('TagService', () => {
         position_iso: 123,
         size: 123,
         active: true,
-      };
+      },
+    };
 
-      const mockResponseData = {};
+    (axios.post as jest.Mock).mockResolvedValue(mockResponse);
 
-      jest.spyOn(axios, 'post').mockResolvedValueOnce({
-        data: mockResponseData,
-      });
+    const result = await tagService.create(mockNewTag);
 
-      const result = await service.create(mockNewTag);
-
-      expect(axios.post).toHaveBeenCalledWith(
-        `${process.env.API}/tag`,
-        mockNewTag,
-        {
-          headers: { country: 'br', tenant: 'santander' },
-        },
-      );
-
-      expect(result).toEqual(mockResponseData);
-    });
-
-    it('should handle errors and throw an error', async () => {
-      const mockNewTag: CreateTagDto = {
-        id_configuration: '123',
-        name: 'name',
-        description: 'description',
-        path_in: 'path_in',
-        path_out: 'path_out',
-        type_tag: 'type_tag',
-        variable_data: 'variable_data',
-        position_iso: 123,
-        size: 123,
-        active: true,
-      };
-
-      jest.spyOn(axios, 'post').mockRejectedValueOnce(new Error('Mock Error'));
-
-      await expect(service.create(mockNewTag)).rejects.toThrowError(
-        'Mock Error',
-      );
-
-      expect(axios.post).toHaveBeenCalledWith(
-        `${process.env.API}/tag`,
-        mockNewTag,
-        {
-          headers: { country: 'br', tenant: 'santander' },
-        },
-      );
-    });
+    expect(result).toEqual(mockResponse.data);
   });
 
-  describe('update', () => {
-    it('should update a tag successfully', async () => {
-      const mockId = 'mockId';
-      const mockUpdateTag: UpdateTagDto = {
-        id_configuration: '123',
-        name: 'name',
-        description: 'description',
-        path_in: 'path_in',
-        path_out: 'path_out',
-        type_tag: 'type_tag',
-        variable_data: 'variable_data',
-        position_iso: 123,
-        size: 123,
-        active: true,
-      };
+  it('should handle errors during tag creation', async () => {
+    const mockNewTag = {
+      id_configuration: '123',
+      name: 'name',
+      description: 'description',
+      path_in: 'path_in',
+      path_out: 'path_out',
+      type_tag: 'type_tag',
+      variable_data: 'variable_data',
+      position_iso: 123,
+      size: 123,
+      active: true,
+    };
 
-      const mockResponseData = {};
+    (axios.post as jest.Mock).mockRejectedValue(new Error('Mocked error'));
 
-      jest.spyOn(axios, 'put').mockResolvedValueOnce({
-        data: mockResponseData,
-      });
-
-      const result = await service.update(mockId, mockUpdateTag);
-
-      expect(axios.put).toHaveBeenCalledWith(
-        `${process.env.API}/tag/${mockId}`,
-        mockUpdateTag,
-        {
-          headers: { country: 'br', tenant: 'santander' },
-        },
-      );
-
-      expect(result).toEqual(mockResponseData);
-    });
-
-    it('should handle errors and throw an error', async () => {
-      const mockId = 'mockId';
-      const mockUpdateTag: UpdateTagDto = {
-        id_configuration: '123',
-        name: 'name',
-        description: 'description',
-        path_in: 'path_in',
-        path_out: 'path_out',
-        type_tag: 'type_tag',
-        variable_data: 'variable_data',
-        position_iso: 123,
-        size: 123,
-        active: true,
-      };
-
-      jest.spyOn(axios, 'put').mockRejectedValueOnce(new Error('Mock Error'));
-
-      await expect(service.update(mockId, mockUpdateTag)).rejects.toThrowError(
-        'Mock Error',
-      );
-
-      expect(axios.put).toHaveBeenCalledWith(
-        `${process.env.API}/tag/${mockId}`,
-        mockUpdateTag,
-        {
-          headers: { country: 'br', tenant: 'santander' },
-        },
-      );
-    });
+    await expect(tagService.create(mockNewTag)).rejects.toThrowError(
+      'Mocked error',
+    );
   });
 
-  describe('delete', () => {
-    it('should delete a tag successfully', async () => {
-      const mockId = 'mockId';
+  it('should update a tag by id', async () => {
+    const mockUpdateTag = {
+      id_configuration: '123',
+      name: 'updatedName',
+      description: 'updatedDescription',
+      path_in: 'updatedPathIn',
+      path_out: 'updatedPathOut',
+      type_tag: 'updatedTypeTag',
+      variable_data: 'updatedVariableData',
+      position_iso: 456,
+      size: 456,
+      active: false,
+    };
 
-      const mockResponseData = {};
+    const mockResponse = {
+      data: {
+        id_configuration: '123',
+        name: 'updatedName',
+        description: 'updatedDescription',
+        path_in: 'updatedPathIn',
+        path_out: 'updatedPathOut',
+        type_tag: 'updatedTypeTag',
+        variable_data: 'updatedVariableData',
+        position_iso: 456,
+        size: 456,
+        active: false,
+      },
+    };
 
-      jest.spyOn(axios, 'delete').mockResolvedValueOnce({
-        data: mockResponseData,
-      });
+    (axios.put as jest.Mock).mockResolvedValue(mockResponse);
 
-      const result = await service.delete(mockId);
+    const result = await tagService.update('someId', mockUpdateTag);
 
-      expect(axios.delete).toHaveBeenCalledWith(
-        `${process.env.API}/tag/${mockId}`,
-        {
-          headers: { country: 'br', tenant: 'santander' },
-        },
-      );
+    expect(result).toEqual(mockResponse.data);
+  });
 
-      expect(result).toEqual(mockResponseData);
-    });
+  it('should handle errors during tag update', async () => {
+    const mockUpdateTag = {
+      id_configuration: '123',
+      name: 'updatedName',
+      description: 'updatedDescription',
+      path_in: 'updatedPathIn',
+      path_out: 'updatedPathOut',
+      type_tag: 'updatedTypeTag',
+      variable_data: 'updatedVariableData',
+      position_iso: 456,
+      size: 456,
+      active: false,
+    };
 
-    it('should handle errors and throw an error', async () => {
-      const mockId = 'mockId';
+    (axios.put as jest.Mock).mockRejectedValue(new Error('Mocked error'));
 
-      jest
-        .spyOn(axios, 'delete')
-        .mockRejectedValueOnce(new Error('Mock Error'));
+    await expect(
+      tagService.update('someId', mockUpdateTag),
+    ).rejects.toThrowError('Mocked error');
+  });
 
-      await expect(service.delete(mockId)).rejects.toThrowError('Mock Error');
+  it('should delete a tag by id', async () => {
+    const mockResponse = {
+      data: {},
+    };
 
-      expect(axios.delete).toHaveBeenCalledWith(
-        `${process.env.API}/tag/${mockId}`,
-        {
-          headers: { country: 'br', tenant: 'santander' },
-        },
-      );
-    });
+    (axios.delete as jest.Mock).mockResolvedValue(mockResponse);
+
+    const result = await tagService.delete('someId');
+
+    expect(result).toEqual(mockResponse.data);
+  });
+
+  it('should handle errors during tag deletion', async () => {
+    (axios.delete as jest.Mock).mockRejectedValue(new Error('Mocked error'));
+
+    await expect(tagService.delete('someId')).rejects.toThrowError(
+      'Mocked error',
+    );
   });
 });

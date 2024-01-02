@@ -18,6 +18,7 @@ export class TagService {
         result = response.data.docs.map((resultTag) => {
           return {
             id: resultTag.id,
+            process_type: resultTag.process_type,
             id_configuration: resultTag.id_configuration,
             name: resultTag.name,
             description: resultTag.description,
@@ -34,7 +35,6 @@ export class TagService {
 
       return result;
     } catch (error) {
-      console.error('Error fetching configurations', error);
       return [];
     }
   }
@@ -50,6 +50,7 @@ export class TagService {
         return {
           id: result.id,
           id_configuration: result.id_configuration,
+          process_type: result.process_type,
           name: result.name,
           description: result.description,
           path_in: result.path_in,
@@ -65,7 +66,7 @@ export class TagService {
       return {};
     } catch (error) {
       console.error('Error fetching Tag', error);
-      return {};
+      return [];
     }
   }
 
@@ -86,7 +87,6 @@ export class TagService {
       updateTag,
       { headers: { country: 'br', tenant: 'santander' } },
     );
-    console.error({ response });
     return response.data;
   }
 
