@@ -47,6 +47,15 @@ describe('TagService', () => {
     ]);
   });
 
+  it('should return an array of tags', async () => {
+    const mockError = new Error('Mocked error');
+    (axios.get as jest.Mock).mockRejectedValue(mockError);
+
+    const result = await tagService.getAll('someId');
+
+    expect(result).toEqual([]);
+  });
+
   it('should return a tag by id', async () => {
     const mockResponse = {
       data: {
