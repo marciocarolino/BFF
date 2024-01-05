@@ -80,6 +80,7 @@ describe('ConfigurationService', () => {
       name: 'ISO 8583 93 - Brazil AMEX Athorization',
       operation_type: '1',
       version: 'Version 1.0',
+      mti: 'mti',
     });
 
     expect(axios.get).toHaveBeenCalledWith(

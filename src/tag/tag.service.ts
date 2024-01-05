@@ -18,16 +18,17 @@ export class TagService {
         result = response.data.docs.map((resultTag) => {
           return {
             id: resultTag.id,
-            process_type: resultTag.process_type,
             id_configuration: resultTag.id_configuration,
             name: resultTag.name,
             description: resultTag.description,
-            path_in: resultTag.path_in,
-            path_out: resultTag.path_out,
-            type_tag: resultTag.type_tag,
-            variable_data: resultTag.variable_data,
+            path_json_in: resultTag.path_json_in,
+            rules_json: resultTag.rules_json,
+            data_element_type: resultTag.data_element_type,
+            data_element_length: resultTag.data_element_length,
+            data_element_fill_pad: resultTag.data_element_fill_pad,
+            data_element_fill_value: resultTag.data_element_fill_value,
             position_iso: resultTag.position_iso,
-            size: resultTag.size,
+            enabled_bitmap: resultTag.enabled_bitmap,
             active: resultTag.active,
           };
         });
@@ -50,15 +51,16 @@ export class TagService {
         return {
           id: result.id,
           id_configuration: result.id_configuration,
-          process_type: result.process_type,
           name: result.name,
           description: result.description,
-          path_in: result.path_in,
-          path_out: result.path_out,
-          type_tag: result.type_tag,
-          variable_data: result.variable_data,
+          path_json_in: result.path_json_in,
+          rules_json: result.rules_json,
+          data_element_type: result.data_element_type,
+          data_element_length: result.data_element_length,
+          data_element_fill_pad: result.data_element_fill_pad,
+          data_element_fill_value: result.data_element_fill_value,
           position_iso: result.position_iso,
-          size: result.size,
+          enabled_bitmap: result.enabled_bitmap,
           active: result.active,
         };
       }

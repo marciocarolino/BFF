@@ -22,6 +22,7 @@ export class ConfigurationService {
             name: resultConfiguration.name,
             description: resultConfiguration.description,
             version: resultConfiguration.version,
+            mti: resultConfiguration.mti,
             enabled: resultConfiguration.enabled,
           };
         });
@@ -47,6 +48,7 @@ export class ConfigurationService {
         name: resultConfiguration.name,
         description: resultConfiguration.description,
         version: resultConfiguration.version,
+        mti: resultConfiguration.mti,
         enabled: resultConfiguration.enabled,
       };
     }

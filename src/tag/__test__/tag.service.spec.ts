@@ -28,12 +28,34 @@ describe('TagService', () => {
 
     expect(result).toEqual([
       {
-        id: 1,
-        process_type: 'example',
+        id: '1',
+        id_configuration: '2',
+        name: 'name',
+        description: 'description',
+        path_json_in: 'path_json_in',
+        rules_json: 'rules_json',
+        data_element_type: 'data_element_type',
+        data_element_length: 'data_element_length',
+        data_element_fill_pad: 'data_element_fill_pad',
+        data_element_fill_value: 'data_element_fill_value',
+        position_iso: 'position_iso',
+        enabled_bitmap: 'enabled_bitmap',
+        active: true,
       },
       {
-        id: 2,
-        process_type: 'example2',
+        id: '2',
+        id_configuration: '2',
+        name: 'name',
+        description: 'description',
+        path_json_in: 'path_json_in',
+        rules_json: 'rules_json',
+        data_element_type: 'data_element_type',
+        data_element_length: 'data_element_length',
+        data_element_fill_pad: 'data_element_fill_pad',
+        data_element_fill_value: 'data_element_fill_value',
+        position_iso: 'position_iso',
+        enabled_bitmap: 'enabled_bitmap',
+        active: true,
       },
     ]);
   });
@@ -61,7 +83,18 @@ describe('TagService', () => {
 
     expect(result).toEqual({
       id: 1,
-      process_type: 'example',
+      id_configuration: undefined,
+      name: undefined,
+      description: undefined,
+      path_json_in: undefined,
+      rules_json: undefined,
+      data_element_type: undefined,
+      data_element_length: undefined,
+      data_element_fill_pad: undefined,
+      data_element_fill_value: undefined,
+      position_iso: undefined,
+      enabled_bitmap: undefined,
+      active: undefined,
     });
   });
 
