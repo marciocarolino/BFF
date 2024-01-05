@@ -1,226 +1,223 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigurationService } from '../configuration.service';
 import axios from 'axios';
-import MockAdapter from 'axios-mock-adapter';
-import { UpdateParamsDTO } from '../dto/UpdateConfigurationDTO';
-import { CreateConfigurationDTO } from '../dto/createConfiguration.dto';
+import { mockNewConfiguration, mockResponse } from './mock/mockData';
+
+jest.mock('axios');
 
 describe('ConfigurationService', () => {
-  let service: ConfigurationService;
-  let axiosMock: MockAdapter;
-
-  beforeAll(() => {
-    process.env.API = 'http://localhost';
-  });
+  let configurationService: ConfigurationService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [ConfigurationService],
     }).compile();
 
-    service = module.get<ConfigurationService>(ConfigurationService);
-    axiosMock = new MockAdapter(axios);
+    configurationService =
+      module.get<ConfigurationService>(ConfigurationService);
   });
 
-  afterEach(() => {
-    axiosMock.reset();
-  });
+  it('should get all configurations', async () => {
+    (axios.get as jest.Mock).mockResolvedValue(mockResponse);
 
-  afterAll(() => {
-    jest.resetAllMocks();
-  });
+    const result = await configurationService.getAll();
 
-  describe('getAll', () => {
-    it('should return configurations', async () => {
-      const mockResponse = {
-        data: {
-          docs: null,
-        },
-      };
-      axiosMock
-        .onGet(`${process.env.API}/configuration`)
-        .reply(200, mockResponse);
-
-      const result = await service.getAll();
-
-      expect(result || []).toEqual([]);
-    });
-
-    it('should handle error and return an empty array', async () => {
-      axiosMock.onGet(`${process.env.API}/configuration`).reply(500);
-
-      const result = await service.getAll();
-
-      expect(result).toEqual([]);
-    });
-
-    it('should handle null response and return an empty array', async () => {
-      const mockResponse = { data: { docs: null } };
-      axiosMock
-        .onGet(`${process.env.API}/configuration`)
-        .reply(200, mockResponse);
-
-      const result = await service.getAll();
-
-      expect(result || []).toEqual([]);
-    });
-  });
-
-  describe('getById', () => {
-    it('should return configuration by ID', async () => {
-      const mockResponse = {
-        data: {
-          docs: [
-            {
-              id: 'cd5fa417-b667-482d-b208-798d9da3213z',
-            },
-          ],
-        },
-      };
-
-      jest
-        .spyOn(service, 'getAll')
-        .mockResolvedValueOnce({ data: { docs: [] } });
-
-      axiosMock
-        .onGet(`${process.env.API}/configuration`)
-        .reply(200, mockResponse);
-
-      const id = 'cd5fa417-b667-482d-b208-798d9da3213z';
-
-      const result = await service.getById(id);
-
-      expect(result).toEqual([]);
-    });
-
-    it('should handle null response and return an empty array', async () => {
-      axiosMock
-        .onGet(`${process.env.API}/configuration`)
-        .reply(200, { data: { docs: null } });
-
-      jest.spyOn(service, 'getAll').mockResolvedValue([]);
-
-      const id = 'cd5fa417-b667-482d-b208-798d9da3213z';
-
-      const result = await service.getById(id);
-
-      expect(result).toEqual([]);
-    });
-  });
-
-  describe('create', () => {
-    it('should create a new configuration', async () => {
-      const mockNewConfiguration: CreateConfigurationDTO = {
-        country_iso: '1',
-        operation_type: '2',
-        brand: '1',
-        name: 'New Configuration',
-        description: 'Description of the new configuration',
-        enabled: true,
+    expect(result).toEqual([
+      {
+        id: 1,
+        country_iso: 'BR',
+        operation_type: 'OPERATION',
+        brand: 'SANTANDER',
+        name: 'Configuration 1',
+        description: 'Description 1',
         version: '1.0',
-      };
-      const mockResponse = {
-        data: {},
-      };
-      axiosMock
-        .onPost(`${process.env.API}/configurations`)
-        .reply(201, mockResponse);
-
-      const result = await service.create(mockNewConfiguration);
-
-      expect(result).toEqual({
-        data: mockResponse.data,
-      });
-    });
-
-    it('should handle error and throw an error', async () => {
-      const mockNewConfiguration: CreateConfigurationDTO = {
-        country_iso: '1',
-        operation_type: '2',
-        brand: '1',
-        name: 'New Configuration',
-        description: 'Description of the new configuration',
         enabled: true,
-        version: '1.0',
-      };
-      axiosMock.onPost(`${process.env.API}/configurations`).reply(500);
+      },
+      {
+        id: 2,
+        country_iso: 'US',
+        operation_type: 'OPERATION',
+        brand: 'CHASE',
+        name: 'Configuration 2',
+        description: 'Description 2',
+        version: '2.0',
+        enabled: false,
+      },
+    ]);
 
-      await expect(service.create(mockNewConfiguration)).rejects.toThrowError();
+    expect(axios.get).toHaveBeenCalledWith(`${process.env.API}/configuration`, {
+      headers: { country: 'br', tenant: 'santander' },
     });
   });
 
-  describe('update', () => {
-    it('should update a configuration', async () => {
-      const mockParams: UpdateParamsDTO = {
-        country: 'br',
-        tenant: 'santander',
-        id: '1',
-      };
-      const mockUpdateConfiguration = {};
-      const mockResponse = {
-        data: {},
-      };
-      axiosMock
-        .onPut(
-          `${process.env.API}/configurations/${mockParams.country}/${mockParams.tenant}/${mockParams.id}`,
-        )
-        .reply(200, mockResponse);
+  it('should return an empty array if getting configurations fails', async () => {
+    const mockError = new Error('Mocked error');
 
-      const id = '1';
+    (axios.get as jest.Mock).mockRejectedValue(mockError);
 
-      const result = await service.update(id, mockUpdateConfiguration);
+    const result = await configurationService.getAll();
 
-      expect(result).toEqual({
-        data: mockResponse.data,
-      });
-    });
+    expect(result).toEqual([]);
 
-    it('should handle error and throw an error', async () => {
-      const mockParams: UpdateParamsDTO = {
-        country: 'br',
-        tenant: 'santander',
-        id: '1',
-      };
-      const mockUpdateConfiguration = {};
-      axiosMock
-        .onPut(
-          `${process.env.API}/configurations/${mockParams.country}/${mockParams.tenant}/${mockParams.id}`,
-        )
-        .reply(500);
-
-      const id = '1';
-
-      // Expectativa
-      await expect(
-        service.update(id, mockUpdateConfiguration),
-      ).rejects.toThrowError();
+    expect(axios.get).toHaveBeenCalledWith(`${process.env.API}/configuration`, {
+      headers: { country: 'br', tenant: 'santander' },
     });
   });
 
-  describe('delete', () => {
-    it('should delete a configuration by ID', async () => {
-      const mockId = '1';
-      const mockResponse = {
-        data: {},
-      };
-      axiosMock
-        .onDelete(`${process.env.API}/configurations/${mockId}`)
-        .reply(204, mockResponse);
+  it('should get configuration by id', async () => {
+    const mockId = '1';
 
-      const result = await service.delete(mockId);
+    (axios.get as jest.Mock).mockResolvedValue({ data: mockNewConfiguration });
 
-      expect(result).toEqual({
-        data: mockResponse.data,
-      });
+    const result = await configurationService.getById(mockId);
+
+    expect(result).toEqual({
+      brand: 'brand',
+      country_iso: 'BR',
+      description: 'ISO 8583 93 - Brazil AMEX Athorization',
+      enabled: true,
+      id: '1',
+      name: 'ISO 8583 93 - Brazil AMEX Athorization',
+      operation_type: '1',
+      version: 'Version 1.0',
     });
 
-    it('should handle error and throw an error', async () => {
-      const mockId = '1';
-      axiosMock
-        .onDelete(`${process.env.API}/configurations/${mockId}`)
-        .reply(500);
+    expect(axios.get).toHaveBeenCalledWith(
+      `${process.env.API}/configuration/${mockId}`,
+      {
+        headers: { country: 'br', tenant: 'santander' },
+      },
+    );
+  });
 
-      await expect(service.delete(mockId)).rejects.toThrowError();
-    });
+  it('should return an empty object when data is not available', async () => {
+    // Configurar o mock do axios para retornar uma resposta sem dados
+    const mockId = '2';
+    const mockResponse = {};
+    (axios.get as jest.Mock).mockResolvedValue(mockResponse);
+
+    const result = await configurationService.getById(mockId);
+
+    expect(result).toEqual({});
+
+    expect(axios.get).toHaveBeenCalledWith(
+      `${process.env.API}/configuration/${mockId}`,
+      {
+        headers: { country: 'br', tenant: 'santander' },
+      },
+    );
+  });
+
+  it('should create a new configuration', async () => {
+    const mockResponse = {
+      data: {},
+    };
+    (axios.post as jest.Mock).mockResolvedValue(mockResponse);
+
+    const result = await configurationService.create(mockNewConfiguration);
+
+    expect(result).toEqual(mockResponse.data);
+
+    expect(axios.post).toHaveBeenCalledWith(
+      `${process.env.API}/configuration`,
+      mockNewConfiguration,
+      { headers: { country: 'br', tenant: 'santander' } },
+    );
+  });
+
+  it('should throw an error if the configuration creation fails', async () => {
+    const mockError = {
+      response: { data: { message: 'Error message' }, status: 500 },
+    };
+    (axios.post as jest.Mock).mockRejectedValue(mockError);
+
+    await expect(
+      configurationService.create(mockNewConfiguration),
+    ).rejects.toThrowError('Error message');
+
+    expect(axios.post).toHaveBeenCalledWith(
+      `${process.env.API}/configuration`,
+      mockNewConfiguration,
+      { headers: { country: 'br', tenant: 'santander' } },
+    );
+  });
+
+  it('should update an existing configuration', async () => {
+    const mockId = '123';
+    const mockUpdateConfiguration = {};
+
+    const mockResponse = {
+      data: {},
+    };
+    (axios.put as jest.Mock).mockResolvedValue(mockResponse);
+
+    const result = await configurationService.update(
+      mockId,
+      mockUpdateConfiguration,
+    );
+
+    expect(result).toEqual(mockResponse.data);
+
+    expect(axios.put).toHaveBeenCalledWith(
+      `${process.env.API}/configuration/${mockId}`,
+      mockUpdateConfiguration,
+      { headers: { country: 'br', tenant: 'santander' } },
+    );
+  });
+
+  it('should throw an error if the configuration update fails', async () => {
+    const mockId = '123';
+    const mockUpdateConfiguration = {};
+
+    const mockError = {
+      response: { data: { message: 'Error message' }, status: 500 },
+    };
+    (axios.put as jest.Mock).mockRejectedValue(mockError);
+
+    await expect(
+      configurationService.update(mockId, mockUpdateConfiguration),
+    ).rejects.toThrowError('Error message');
+
+    expect(axios.put).toHaveBeenCalledWith(
+      `${process.env.API}/configuration/${mockId}`,
+      mockUpdateConfiguration,
+      { headers: { country: 'br', tenant: 'santander' } },
+    );
+  });
+
+  it('should delete an existing configuration', async () => {
+    const mockId = '123';
+
+    const mockResponse = {
+      data: {},
+    };
+    (axios.delete as jest.Mock).mockResolvedValue(mockResponse);
+
+    const result = await configurationService.delete(mockId);
+
+    expect(result).toEqual(mockResponse.data);
+
+    expect(axios.delete).toHaveBeenCalledWith(
+      `${process.env.API}/configuration/${mockId}`,
+      { headers: { country: 'br', tenant: 'santander' } },
+    );
+  });
+
+  it('should throw an error if the configuration deletion fails', async () => {
+    const mockId = '123';
+
+    const mockError = {
+      response: { data: { message: 'Error message' }, status: 500 },
+    };
+    (axios.delete as jest.Mock).mockRejectedValue(mockError);
+
+    await expect(configurationService.delete(mockId)).rejects.toThrowError(
+      'Error message',
+    );
+
+    expect(axios.delete).toHaveBeenCalledWith(
+      `${process.env.API}/configuration/${mockId}`,
+      { headers: { country: 'br', tenant: 'santander' } },
+    );
   });
 });

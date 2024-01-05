@@ -65,7 +65,6 @@ export class TagService {
 
       return {};
     } catch (error) {
-      console.error('Error fetching Tag', error);
       return [];
     }
   }

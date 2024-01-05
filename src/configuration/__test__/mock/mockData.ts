@@ -1,4 +1,5 @@
 import { UpdateConfigurationDTO } from 'src/configuration/dto/UpdateConfigurationDTO';
+import { CreateConfigurationDTO } from 'src/configuration/dto/createConfiguration.dto';
 
 export const mockConfigurations = {
   configuration: [
@@ -7,22 +8,53 @@ export const mockConfigurations = {
   ],
 };
 
-export const mockNewConfiguration = {
-  country_iso: 1,
-  operation_type: 1,
-  brand: 1,
-  name: 'New Configuration',
-  description: 'New Description',
+export const mockNewConfiguration: CreateConfigurationDTO = {
+  id: '1',
+  country_iso: 'BR',
+  operation_type: '1',
+  brand: 'brand',
+  name: 'ISO 8583 93 - Brazil AMEX Athorization',
+  description: 'ISO 8583 93 - Brazil AMEX Athorization',
+  version: 'Version 1.0',
+  mti: 'mti',
   enabled: true,
-  version: '1.0',
 };
 
 export const mockUpdateConfiguration: UpdateConfigurationDTO = {
-  country_iso: 1,
-  operation_type: 1,
-  brand: 1,
-  name: 'Novo Nome',
-  description: 'Nova Descrição',
+  id: 'string',
+  country_iso: 'string',
+  operation_type: 'string',
+  brand: 'string',
+  name: 'string',
+  description: 'string',
+  version: 'string',
+  mti: 'string',
   enabled: true,
-  version: 'Versão 2.0',
+};
+
+export const mockResponse = {
+  data: {
+    docs: [
+      {
+        id: 1,
+        country_iso: 'BR',
+        operation_type: 'OPERATION',
+        brand: 'SANTANDER',
+        name: 'Configuration 1',
+        description: 'Description 1',
+        version: '1.0',
+        enabled: true,
+      },
+      {
+        id: 2,
+        country_iso: 'US',
+        operation_type: 'OPERATION',
+        brand: 'CHASE',
+        name: 'Configuration 2',
+        description: 'Description 2',
+        version: '2.0',
+        enabled: false,
+      },
+    ],
+  },
 };

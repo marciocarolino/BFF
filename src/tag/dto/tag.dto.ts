@@ -1,65 +1,95 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTagDto {
-  @ApiProperty({ description: 'id_configuration', example: '123' })
+  @ApiProperty({ name: 'id', example: '1' })
+  id: string;
+
+  @ApiProperty({ name: 'id_configuration', example: 'id_configuration' })
   id_configuration: string;
 
-  @ApiProperty({ description: 'name', example: 'name' })
+  @ApiProperty({ name: 'name', example: 'name' })
   name: string;
 
-  @ApiProperty({ description: 'description', example: 'description' })
+  @ApiProperty({ name: 'description', example: 'description' })
   description: string;
 
-  @ApiProperty({ description: 'path_in', example: 'path_in' })
-  path_in: string;
+  @ApiProperty({ name: 'path_json_in', example: 'path_json_in' })
+  path_json_in: string;
 
-  @ApiProperty({ description: 'path_out', example: 'path_out' })
-  path_out: string;
+  @ApiProperty({ name: 'rules_json', example: 'rules_json' })
+  rules_json: string;
 
-  @ApiProperty({ description: 'type_tag', example: 'type_tag' })
-  type_tag: string;
+  @ApiProperty({ name: 'data_element_type', example: 'data_element_type' })
+  data_element_type: string;
 
-  @ApiProperty({ description: 'variable_data', example: 'variable_data' })
-  variable_data: string;
+  @ApiProperty({ name: 'data_element_length', example: 'data_element_length' })
+  data_element_length: string;
 
-  @ApiProperty({ description: 'position_iso', example: 123 })
-  position_iso: number;
+  @ApiProperty({
+    name: 'data_element_fill_pad',
+    example: 'data_element_fill_pad',
+  })
+  data_element_fill_pad: string;
 
-  @ApiProperty({ description: 'size', example: 123 })
-  size: number;
+  @ApiProperty({
+    name: 'data_element_fill_value',
+    example: 'data_element_fill_value',
+  })
+  data_element_fill_value: string;
 
-  @ApiProperty({ description: 'id_configuration', example: true })
+  @ApiProperty({ name: 'position_iso', example: 'position_iso' })
+  position_iso: string;
+
+  @ApiProperty({ name: 'enabled_bitmap', example: 'enabled_bitmap' })
+  enabled_bitmap: string;
+
+  @ApiProperty({ name: 'active', example: true })
   active: boolean;
 }
 
 export class UpdateTagDto {
-  @ApiProperty({ description: 'id_configuration', example: '123' })
+  @ApiProperty({ name: 'id', example: '1' })
+  id: string;
+
+  @ApiProperty({ name: 'id_configuration', example: 'id_configuration' })
   id_configuration: string;
 
-  @ApiProperty({ description: 'name', example: 'name' })
+  @ApiProperty({ name: 'name', example: 'name' })
   name: string;
 
-  @ApiProperty({ description: 'description', example: 'description' })
+  @ApiProperty({ name: 'description', example: 'description' })
   description: string;
 
-  @ApiProperty({ description: 'path_in', example: 'path_in' })
-  path_in: string;
+  @ApiProperty({ name: 'path_json_in', example: 'path_json_in' })
+  path_json_in: string;
 
-  @ApiProperty({ description: 'path_out', example: 'path_out' })
-  path_out: string;
+  @ApiProperty({ name: 'rules_json', example: 'rules_json' })
+  rules_json: string;
 
-  @ApiProperty({ description: 'type_tag', example: 'type_tag' })
-  type_tag: string;
+  @ApiProperty({ name: 'data_element_type', example: 'data_element_type' })
+  data_element_type: string;
 
-  @ApiProperty({ description: 'variable_data', example: 'variable_data' })
-  variable_data: string;
+  @ApiProperty({ name: 'data_element_length', example: 'data_element_length' })
+  data_element_length: string;
 
-  @ApiProperty({ description: 'position_iso', example: 123 })
-  position_iso: number;
+  @ApiProperty({
+    name: 'data_element_fill_pad',
+    example: 'data_element_fill_pad',
+  })
+  data_element_fill_pad: string;
 
-  @ApiProperty({ description: 'size', example: 123 })
-  size: number;
+  @ApiProperty({
+    name: 'data_element_fill_value',
+    example: 'data_element_fill_value',
+  })
+  data_element_fill_value: string;
 
-  @ApiProperty({ description: 'id_configuration', example: true })
+  @ApiProperty({ name: 'position_iso', example: 'position_iso' })
+  position_iso: string;
+
+  @ApiProperty({ name: 'enabled_bitmap', example: 'enabled_bitmap' })
+  enabled_bitmap: string;
+
+  @ApiProperty({ name: 'active', example: true })
   active: boolean;
 }
